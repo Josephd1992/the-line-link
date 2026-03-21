@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Line Link - Record Support</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-align: center; background: #0f172a; color: white; padding: 20px; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
+        .container { max-width: 400px; width: 90%; background: #1e293b; padding: 40px; border-radius: 24px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); border: 1px solid #334155; }
+        h1 { color: #38bdf8; margin-bottom: 10px; font-size: 2rem; }
+        p { color: #94a3b8; margin-bottom: 30px; line-height: 1.5; }
+        button { width: 100%; padding: 20px; margin: 10px 0; font-size: 1.1rem; font-weight: bold; border-radius: 12px; cursor: pointer; border: none; transition: transform 0.1s, background 0.3s; }
+        #recordBtn { background: #ef4444; color: white; }
+        #stopBtn { background: #64748b; color: white; display: none; }
+        .status { margin-top: 25px; font-weight: 500; color: #fbbf24; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>The Line Link</h1>
+    <p>Your voice matters. Leave a quick word of support for a fellow responder.</p>
+    
+    <button id="recordBtn">Start Recording</button>
+    <button id="stopBtn">Stop & Send Message</button>
+
+    <div id="status" class="status">Ready to connect...</div>
+</div>
+
+<script type="module">
+    // These links grab the specific tools we need (Storage and Firestore)
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
+    import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    // Your exact keys plugged in here!
+    const firebaseConfig = {
+        apiKey: "AIzaSyC4-eypucZ9FjS4sk4CQgkeNMPyyh4HvcU",
+        authDomain: "the-line-link.firebaseapp.com",
+        projectId: "the-line-link",
+        storageBucket: "the-line-link.firebasestorage.app",
+        messagingSenderId: "378236622341",
+        appId: "1:378236622341:web:6809e3cd491a7e945b2e6c",
+        measurementId: "G-KHPWDYHQRF"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const storage = getStorage(app);
+
+    let mediaRecorder;
+    let audioChunks = [];
+
+    const recordBtn = document.getElementById('recordBtn');
+    const stopBtn = document.getElementById('stopBtn');
+    const status = document.getElementById('status');
+
+    recordBtn.onclick = async () => {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            mediaRecorder = new MediaRecorder(stream);
+            audioChunks = [];
+
+            mediaRecorder.ondataavailable = (e) => audioChunks.push(e.data);
+            mediaRecorder.onstop = () => {
+                const blob = new Blob(audioChunks, { type: 'audio/webm' });
+                uploadAudio(blob);
+            };
+
+            mediaRecorder.start();
+            recordBtn.style.display = 'none';
+            stopBtn.style.display = 'block';
+            status.innerText = "Recording... Speak clearly.";
+        } catch (err) {
+            status.innerText = "Error: Please allow microphone access.";
+        }
+    };
+
+    stopBtn.onclick = () => {
+        mediaRecorder.stop();
+        stopBtn.style.display = 'none';
+        recordBtn.style.display = 'block';
+        status.innerText = "Sending to the vault...";
+    };
+
+    async function uploadAudio(blob) {
+        try {
+            const fileName = `msg_${Date.now()}.webm`;
+            const storageRef = ref(storage, 'audios/' + fileName);
+            const snapshot = await uploadBytes(storageRef, blob);
+            const url = await getDownloadURL(snapshot.ref);
+            
+            await addDoc(collection(db, "messages"), {
+                url: url,
+                timestamp: serverTimestamp()
+            });
+
+            status.style.color = "#4ade80";
+            status.innerText = "Message Received! Thank you.";
+        } catch (e) {
+            console.error(e);
+            status.innerText = "Upload failed. Check if Storage is in 'Test Mode'.";
+        }
+    }
+</script>
+</body>
+</html>
