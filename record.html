@@ -3,38 +3,87 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Line Link - Record</title>
+    <title>The Gold Line Link - Record</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; text-align: center; background: #0f172a; color: white; padding: 20px; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
-        .container { max-width: 400px; width: 90%; background: #1e293b; padding: 30px; border-radius: 24px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); border: 1px solid #334155; }
-        h1 { color: #38bdf8; margin-bottom: 10px; }
-        button { width: 100%; padding: 18px; margin: 10px 0; font-size: 1.1rem; font-weight: bold; border-radius: 12px; cursor: pointer; border: none; transition: 0.2s; }
-        #recordBtn { background: #ef4444; color: white; }
-        #stopBtn { background: #f97316; color: white; display: none; }
-        #previewArea { display: none; margin-top: 20px; border-top: 1px solid #334155; padding-top: 20px; }
-        audio { width: 100%; margin-bottom: 15px; }
-        #sendBtn { background: #22c55e; color: white; }
-        #redoBtn { background: #64748b; color: white; }
-        .status { margin-top: 20px; color: #fbbf24; font-weight: 500; }
+        body { font-family: 'Segoe UI', sans-serif; background: #000000; color: white; padding: 20px; display: flex; justify-content: center; margin: 0; }
+        .container { max-width: 500px; width: 100%; padding-bottom: 50px; }
+        h1 { color: #fbbf24; text-align: center; margin-bottom: 10px; }
+        .sub-text { text-align: center; color: #94a3b8; margin-bottom: 30px; font-size: 0.9rem; }
+
+        /* Agency Selector */
+        .section-label { font-size: 0.8rem; text-transform: uppercase; color: #fbbf24; letter-spacing: 1px; margin-bottom: 10px; font-weight: bold; }
+        .agency-picker { display: flex; gap: 10px; margin-bottom: 30px; }
+        .agency-btn { flex: 1; padding: 12px; border: 1px solid #334155; border-radius: 8px; background: #111111; color: #94a3b8; cursor: pointer; font-weight: bold; transition: 0.3s; }
+        .agency-btn.active[data-type="LEO"] { border-color: #3b82f6; color: #3b82f6; background: rgba(59, 130, 246, 0.1); }
+        .agency-btn.active[data-type="FIRE"] { border-color: #ef4444; color: #ef4444; background: rgba(239, 68, 68, 0.1); }
+        .agency-btn.active[data-type="EMS"] { border-color: #22c55e; color: #22c55e; background: rgba(34, 197, 94, 0.1); }
+
+        /* Prompt Cards */
+        .prompt-card { background: #111111; border: 1px solid #334155; border-radius: 16px; padding: 20px; margin-bottom: 20px; transition: 0.3s; }
+        .prompt-card.recording { border-color: #fbbf24; box-shadow: 0 0 15px rgba(251, 191, 36, 0.2); }
+        .prompt-title { font-weight: bold; margin-bottom: 15px; font-size: 1.05rem; line-height: 1.4; }
+        
+        .controls { display: flex; gap: 10px; }
+        .rec-btn { flex: 2; padding: 12px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; background: #fbbf24; color: #000; }
+        .stop-btn { flex: 1; padding: 12px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; background: #ef4444; color: white; display: none; }
+        .preview-btn { flex: 1; padding: 12px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; background: #475569; color: white; display: none; }
+
+        /* Text Box Section */
+        .text-area { width: 100%; background: #111111; border: 1px solid #334155; border-radius: 12px; padding: 15px; color: white; font-family: inherit; resize: none; margin-bottom: 20px; box-sizing: border-box; }
+
+        /* Final Submit */
+        .submit-btn { width: 100%; padding: 20px; border-radius: 12px; border: none; background: #fbbf24; color: #000; font-size: 1.2rem; font-weight: bold; cursor: pointer; margin-top: 20px; }
+        .submit-btn:disabled { background: #334155; color: #64748b; cursor: not-allowed; }
+        #status { text-align: center; margin-top: 15px; color: #fbbf24; font-weight: bold; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>The Line Link</h1>
-    <p id="instruction">Share a word for the next shift.</p>
-    
-    <button id="recordBtn">Start Recording</button>
-    <button id="stopBtn">Stop Recording</button>
+    <h1>Record Your Message</h1>
+    <p class="sub-text">Select your agency and a prompt below.</p>
 
-    <div id="previewArea">
-        <p>Review your message:</p>
-        <audio id="audioPreview" controls></audio>
-        <button id="sendBtn">Send to the Link</button>
-        <button id="redoBtn">Delete & Redo</button>
+    <div class="section-label">1. Who is sending this?</div>
+    <div class="agency-picker">
+        <button class="agency-btn" data-type="LEO">LAW ENFORCEMENT</button>
+        <button class="agency-btn" data-type="FIRE">FIRE</button>
+        <button class="agency-btn" data-type="EMS">EMS</button>
     </div>
 
-    <div id="status" class="status">Ready...</div>
+    <div class="section-label">2. Choose a Prompt to Record</div>
+    
+    <div class="prompt-card" id="card-1">
+        <div class="prompt-title">What would you want dispatchers to know about how important they are to you?</div>
+        <div class="controls">
+            <button class="rec-btn" onclick="startRec(1)">Record Voice</button>
+            <button class="stop-btn" onclick="stopRec(1)">Stop</button>
+            <button class="preview-btn" onclick="playPrev(1)">Preview</button>
+        </div>
+    </div>
+
+    <div class="prompt-card" id="card-2">
+        <div class="prompt-title">Tell us about a call that stuck with you and how dispatch played a role in it.</div>
+        <div class="controls">
+            <button class="rec-btn" onclick="startRec(2)">Record Voice</button>
+            <button class="stop-btn" onclick="stopRec(2)">Stop</button>
+            <button class="preview-btn" onclick="playPrev(2)">Preview</button>
+        </div>
+    </div>
+
+    <div class="prompt-card" id="card-3">
+        <div class="prompt-title">Can you share a moment when a dispatcher made a difference for you?</div>
+        <div class="controls">
+            <button class="rec-btn" onclick="startRec(3)">Record Voice</button>
+            <button class="stop-btn" onclick="stopRec(3)">Stop</button>
+            <button class="preview-btn" onclick="playPrev(3)">Preview</button>
+        </div>
+    </div>
+
+    <div class="section-label">Or Leave a Written Note</div>
+    <textarea class="text-area" id="noteText" rows="4" placeholder="Type your message of appreciation here..."></textarea>
+
+    <button class="submit-btn" id="submitAll" onclick="finalSubmit()">Submit to the Link</button>
+    <div id="status">Ready...</div>
 </div>
 
 <script type="module">
@@ -58,72 +107,85 @@
 
     let mediaRecorder;
     let audioChunks = [];
-    let audioBlob;
+    let selectedAgency = "";
+    let activePrompt = "";
+    let finalBlob = null;
 
-    const recordBtn = document.getElementById('recordBtn');
-    const stopBtn = document.getElementById('stopBtn');
-    const previewArea = document.getElementById('previewArea');
-    const audioPreview = document.getElementById('audioPreview');
-    const sendBtn = document.getElementById('sendBtn');
-    const redoBtn = document.getElementById('redoBtn');
-    const status = document.getElementById('status');
+    // Agency Selection Logic
+    document.querySelectorAll('.agency-btn').forEach(btn => {
+        btn.onclick = () => {
+            document.querySelectorAll('.agency-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            selectedAgency = btn.getAttribute('data-type');
+        };
+    });
 
-    recordBtn.onclick = async () => {
+    // Recording Logic
+    window.startRec = async (id) => {
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
         mediaRecorder = new MediaRecorder(stream);
         audioChunks = [];
+        activePrompt = document.querySelector(`#card-${id} .prompt-title`).innerText;
 
-        mediaRecorder.ondataavailable = (e) => audioChunks.push(e.data);
+        mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
         mediaRecorder.onstop = () => {
-            audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
-            const audioUrl = URL.createObjectURL(audioBlob);
-            audioPreview.src = audioUrl;
-            previewArea.style.display = 'block';
-            status.innerText = "Preview your message above.";
+            finalBlob = new Blob(audioChunks, { type: 'audio/webm' });
+            document.querySelector(`#card-${id} .preview-btn`).style.display = 'block';
         };
 
         mediaRecorder.start();
-        recordBtn.style.display = 'none';
-        stopBtn.style.display = 'block';
-        status.innerText = "Recording...";
+        document.querySelectorAll('.prompt-card').forEach(c => c.classList.remove('recording'));
+        document.getElementById(`card-${id}`).classList.add('recording');
+        document.querySelector(`#card-${id} .rec-btn`).style.display = 'none';
+        document.querySelector(`#card-${id} .stop-btn`).style.display = 'block';
     };
 
-    stopBtn.onclick = () => {
+    window.stopRec = (id) => {
         mediaRecorder.stop();
-        stopBtn.style.display = 'none';
+        document.querySelector(`#card-${id} .stop-btn`).style.display = 'none';
+        document.querySelector(`#card-${id} .rec-btn`).innerText = "Redo Recording";
+        document.querySelector(`#card-${id} .rec-btn`).style.display = 'block';
     };
 
-    redoBtn.onclick = () => {
-        previewArea.style.display = 'none';
-        recordBtn.style.display = 'block';
-        status.innerText = "Previous recording deleted. Ready to try again.";
+    window.playPrev = (id) => {
+        const audioUrl = URL.createObjectURL(finalBlob);
+        const audio = new Audio(audioUrl);
+        audio.play();
     };
 
-    sendBtn.onclick = async () => {
-        sendBtn.disabled = true;
-        redoBtn.style.display = 'none';
-        status.innerText = "Uploading to the Link...";
-        
+    window.finalSubmit = async () => {
+        const note = document.getElementById('noteText').value;
+        if (!selectedAgency) { alert("Please select your agency first!"); return; }
+        if (!finalBlob && !note) { alert("Please record a message or type a note."); return; }
+
+        const submitBtn = document.getElementById('submitAll');
+        const status = document.getElementById('status');
+        submitBtn.disabled = true;
+        status.innerText = "Submitting...";
+
         try {
-            const fileName = `line_${Date.now()}.webm`;
-            const storageRef = ref(storage, 'audios/' + fileName);
-            const snapshot = await uploadBytes(storageRef, audioBlob);
-            const url = await getDownloadURL(snapshot.ref);
-            
+            let fileUrl = "";
+            if (finalBlob) {
+                const fileName = `voice_${Date.now()}.webm`;
+                const storageRef = ref(storage, 'audios/' + fileName);
+                const snapshot = await uploadBytes(storageRef, finalBlob);
+                fileUrl = await getDownloadURL(snapshot.ref);
+            }
+
             await addDoc(collection(db, "messages"), {
-                url: url,
+                agency: selectedAgency,
+                prompt: activePrompt || "Written Note",
+                audioUrl: fileUrl,
+                textNote: note,
                 timestamp: serverTimestamp()
             });
 
-            status.style.color = "#4ade80";
-            status.innerText = "Success! Message sent.";
-            previewArea.style.display = 'none';
-            recordBtn.style.display = 'block';
-            sendBtn.disabled = false;
-            redoBtn.style.display = 'block';
+            status.innerText = "Success! Submitted to the Link.";
+            setTimeout(() => window.location.href = "index.html", 2000);
         } catch (e) {
-            status.innerText = "Error uploading. Try again.";
-            sendBtn.disabled = false;
+            console.error(e);
+            status.innerText = "Error. Try again.";
+            submitBtn.disabled = false;
         }
     };
 </script>
