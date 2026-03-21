@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Line Link - Listen</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; text-align: center; background: #0f172a; color: white; padding: 20px; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
+        .container { max-width: 400px; width: 90%; background: #1e293b; padding: 40px; border-radius: 24px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); border: 1px solid #334155; }
+        h1 { color: #fbbf24; margin-bottom: 10px; font-size: 2rem; } /* Gold for the 'Support' side */
+        p { color: #94a3b8; margin-bottom: 30px; }
+        #playBtn { width: 100%; padding: 25px; font-size: 1.3rem; font-weight: bold; border-radius: 12px; cursor: pointer; border: none; background: #38bdf8; color: white; transition: 0.3s; }
+        #playBtn:hover { background: #0ea5e9; }
+        #playBtn:disabled { background: #475569; cursor: not-allowed; }
+        .status { margin-top: 25px; font-weight: 500; color: #4ade80; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>The Line Link</h1>
+    <p>Tap below to hear a random message of support from your team.</p>
+    
+    <button id="playBtn">Get a Pick-Me-Up</button>
+
+    <div id="status" class="status">Ready to listen...</div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    // Your exact keys
+    const firebaseConfig = {
+        apiKey: "AIzaSyC4-eypucZ9FjS4sk4CQgkeNMPyyh4HvcU",
+        authDomain: "the-line-link.firebaseapp.com",
+        projectId: "the-line-link",
+        storageBucket: "the-line-link.firebasestorage.app",
+        messagingSenderId: "378236622341",
+        appId: "1:378236622341:web:6809e3cd491a7e945b2e6c"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const playBtn = document.getElementById('playBtn');
+    const status = document.getElementById('status');
+
+    playBtn.onclick = async () => {
+        playBtn.disabled = true;
+        status.innerText = "Finding a message...";
+        
+        try {
+            // 1. Get all messages from the database
+            const querySnapshot = await getDocs(collection(db, "messages"));
+            const messages = querySnapshot.docs.map(doc => doc.data());
+
+            if (messages.length === 0) {
+                status.innerText = "No messages in the vault yet!";
+                playBtn.disabled = false;
+                return;
+            }
+
+            // 2. Pick a random one
+            const randomMsg = messages[Math.floor(Math.random() * messages.length)];
+
+            // 3. Play the audio
+            const audio = new Audio(randomMsg.url);
+            status.innerText = "Playing support...";
+            
+            audio.play();
+
+            audio.onended = () => {
+                status.innerText = "Ready for another?";
+                playBtn.disabled = false;
+            };
+        } catch (e) {
+            console.error(e);
+            status.innerText = "Error playing audio.";
+            playBtn.disabled = false;
+        }
+    };
+</script>
+</body>
+</html>
