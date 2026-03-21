@@ -6,47 +6,67 @@
     <title>The Gold Line Link - Gallery</title>
     <style>
         body { font-family: 'Segoe UI', sans-serif; background: #000000; color: white; padding: 20px; margin: 0; display: flex; justify-content: center; }
-        .container { max-width: 500px; width: 100%; }
+        .container { max-width: 500px; width: 100%; padding-bottom: 50px; }
         h1 { color: #fbbf24; text-align: center; margin-bottom: 5px; }
-        .sub-text { text-align: center; color: #94a3b8; margin-bottom: 30px; font-size: 0.9rem; }
-
-        #messageList { display: flex; flex-direction: column; gap: 20px; }
-        .message-card { background: #111111; border: 1px solid #334155; border-radius: 16px; padding: 20px; position: relative; overflow: hidden; }
         
-        /* Agency Stripes with White for EMS */
-        .agency-stripe { position: absolute; top: 0; left: 0; width: 6px; height: 100%; }
+        .controls-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 25px; justify-content: center; }
+        .filter-btn { padding: 8px 15px; border-radius: 20px; border: 1px solid #334155; background: #111111; color: #94a3b8; cursor: pointer; font-size: 0.8rem; font-weight: bold; transition: 0.3s; }
+        .filter-btn.active { background: #fbbf24; color: #000; border-color: #fbbf24; }
+        
+        .random-btn { padding: 8px 15px; border-radius: 20px; border: 1px solid #fbbf24; background: transparent; color: #fbbf24; cursor: pointer; font-size: 0.8rem; font-weight: bold; }
+
+        #messageList { display: flex; flex-direction: column; gap: 12px; }
+        .message-card { background: #111111; border: 1px solid #334155; border-radius: 12px; padding: 15px; position: relative; overflow: hidden; cursor: pointer; transition: 0.2s; }
+        
+        .agency-stripe { position: absolute; top: 0; left: 0; width: 4px; height: 100%; }
         .stripe-LEO { background: #3b82f6; }
         .stripe-FIRE { background: #ef4444; }
         .stripe-EMS { background: #ffffff; }
 
-        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .agency-label { font-size: 0.75rem; font-weight: bold; letter-spacing: 1px; }
+        .card-header { display: flex; justify-content: space-between; align-items: center; pointer-events: none; }
+        .agency-label { font-size: 0.7rem; font-weight: bold; letter-spacing: 1px; }
         .LEO-text { color: #3b82f6; }
         .FIRE-text { color: #ef4444; }
         .EMS-text { color: #ffffff; }
 
-        .prompt-info { color: #fbbf24; font-size: 0.85rem; font-style: italic; margin-bottom: 10px; line-height: 1.3; }
-        .timestamp { color: #475569; font-size: 0.75rem; }
+        .prompt-preview { color: #fbbf24; font-size: 0.9rem; margin-top: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 80%; }
+        .timestamp { color: #475569; font-size: 0.7rem; }
 
-        .audio-player { width: 100%; margin-top: 15px; border-radius: 8px; }
-        .text-note { background: #1a1a1a; padding: 15px; border-radius: 8px; margin-top: 10px; font-size: 1rem; line-height: 1.5; color: #e2e8f0; border: 1px solid #334155; }
+        /* Hidden Content */
+        .card-content { display: none; margin-top: 15px; border-top: 1px solid #334155; padding-top: 15px; }
+        .audio-player { width: 100%; margin-top: 5px; }
+        .text-note { background: #1a1a1a; padding: 12px; border-radius: 8px; font-size: 0.95rem; line-height: 1.5; color: #e2e8f0; border: 1px solid #334155; }
+
+        /* Secret Delete Button */
+        .delete-trigger { margin-top: 15px; color: #475569; font-size: 0.6rem; text-align: right; text-transform: uppercase; cursor: pointer; }
+        .delete-trigger:hover { color: #ef4444; }
 
         #status { text-align: center; margin-top: 20px; color: #fbbf24; }
+        .nav-link { display: block; text-align: center; margin-top: 30px; color: #64748b; text-decoration: none; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <h1>Appreciation Gallery</h1>
-    <p class="sub-text">Messages from the field to the Gold Line.</p>
     
-    <div id="status">Loading the Link...</div>
+    <div class="controls-row">
+        <button class="filter-btn active" onclick="filterGallery('ALL', this)">ALL</button>
+        <button class="filter-btn" onclick="filterGallery('LEO', this)">LAW</button>
+        <button class="filter-btn" onclick="filterGallery('FIRE', this)">FIRE</button>
+        <button class="filter-btn" onclick="filterGallery('EMS', this)">EMS</button>
+        <button class="random-btn" onclick="playRandom()">🎲 RANDOM</button>
+    </div>
+    
+    <div id="status">Loading...</div>
     <div id="messageList"></div>
+
+    <a href="index.html" class="nav-link">← Back to Home</a>
 </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, collection, getDocs, query, orderBy, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyC4-eypucZ9FjS4sk4CQgkeNMPyyh4HvcU",
@@ -61,6 +81,9 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
+    let allMessages = [];
+    const SUPERVISOR_KEY = "1033"; // CHANGE THIS TO YOUR SECRET PIN
+
     async function loadGallery() {
         const messageList = document.getElementById('messageList');
         const status = document.getElementById('status');
@@ -68,40 +91,91 @@
         try {
             const q = query(collection(db, "messages"), orderBy("timestamp", "desc"));
             const querySnapshot = await getDocs(q);
+            allMessages = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
             
             status.style.display = 'none';
-            messageList.innerHTML = '';
-
-            if (querySnapshot.empty) {
-                status.style.display = 'block';
-                status.innerText = "The gallery is waiting for the first message of the week.";
-                return;
-            }
-
-            querySnapshot.forEach((doc) => {
-                const data = doc.data();
-                const timeStr = data.timestamp ? data.timestamp.toDate().toLocaleString([], {month: 'short', day: 'numeric', hour: '2-digit', minute:'2-digit'}) : "Just now";
-                
-                const card = document.createElement('div');
-                card.className = 'message-card';
-                
-                card.innerHTML = `
-                    <div class="agency-stripe stripe-${data.agency}"></div>
-                    <div class="card-header">
-                        <span class="agency-label ${data.agency}-text">${data.agency}</span>
-                        <span class="timestamp">${timeStr}</span>
-                    </div>
-                    <div class="prompt-info">"${data.prompt}"</div>
-                    ${data.audioUrl ? `<audio controls class="audio-player" src="${data.audioUrl}"></audio>` : ''}
-                    ${data.textNote ? `<div class="text-note">${data.textNote}</div>` : ''}
-                `;
-                messageList.appendChild(card);
-            });
+            renderMessages(allMessages);
         } catch (e) {
             console.error(e);
-            status.innerText = "Error loading gallery. Please refresh.";
+            status.innerText = "Error loading gallery.";
         }
     }
+
+    function renderMessages(data) {
+        const messageList = document.getElementById('messageList');
+        messageList.innerHTML = '';
+
+        data.forEach((msg) => {
+            const timeStr = msg.timestamp ? msg.timestamp.toDate().toLocaleString([], {month: 'short', day: 'numeric', hour: '2-digit', minute:'2-digit'}) : "Just now";
+            const card = document.createElement('div');
+            card.className = `message-card agency-${msg.agency}`;
+            card.onclick = (e) => toggleCard(e, card);
+            
+            card.innerHTML = `
+                <div class="agency-stripe stripe-${msg.agency}"></div>
+                <div class="card-header">
+                    <span class="agency-label ${msg.agency}-text">${msg.agency}</span>
+                    <span class="timestamp">${timeStr}</span>
+                </div>
+                <div class="prompt-preview">${msg.prompt}</div>
+                <div class="card-content">
+                    ${msg.audioUrl ? `<audio controls class="audio-player" src="${msg.audioUrl}"></audio>` : ''}
+                    ${msg.textNote ? `<div class="text-note">${msg.textNote}</div>` : ''}
+                    <div class="delete-trigger" onclick="adminDelete('${msg.id}')">Admin Only</div>
+                </div>
+            `;
+            messageList.appendChild(card);
+        });
+    }
+
+    window.toggleCard = (e, card) => {
+        if (e.target.tagName === 'AUDIO' || e.target.className === 'delete-trigger') return;
+        const content = card.querySelector('.card-content');
+        const isOpen = content.style.display === 'block';
+        content.style.display = isOpen ? 'none' : 'block';
+    };
+
+    // THE SECRET DELETE FUNCTION
+    window.adminDelete = async (id) => {
+        const pin = prompt("Enter Supervisor PIN to delete this entry:");
+        if (pin === SUPERVISOR_KEY) {
+            if (confirm("Are you sure you want to remove this from the gallery?")) {
+                try {
+                    await deleteDoc(doc(db, "messages", id));
+                    alert("Entry deleted.");
+                    loadGallery(); // Refresh the list
+                } catch (e) {
+                    alert("Error deleting entry.");
+                }
+            }
+        } else if (pin !== null) {
+            alert("Unauthorized Access.");
+        }
+    };
+
+    window.filterGallery = (agency, btn) => {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const filtered = agency === 'ALL' ? allMessages : allMessages.filter(m => m.agency === agency);
+        renderMessages(filtered);
+    };
+
+    window.playRandom = () => {
+        if (allMessages.length === 0) return;
+        const randomMsg = allMessages[Math.floor(Math.random() * allMessages.length)];
+        filterGallery('ALL', document.querySelector('[onclick*="ALL"]'));
+        setTimeout(() => {
+            const cards = document.querySelectorAll('.message-card');
+            cards.forEach(c => {
+                if(c.querySelector('.prompt-preview').innerText === randomMsg.prompt) {
+                    c.click();
+                    c.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    c.style.borderColor = '#fbbf24';
+                    setTimeout(() => c.style.borderColor = '#334155', 2000);
+                }
+            });
+        }, 100);
+    };
 
     loadGallery();
 </script>
