@@ -10,11 +10,9 @@
         h1 { color: #fbbf24; text-align: center; margin-bottom: 10px; margin-top: 10px;}
         .sub-text { text-align: center; color: #94a3b8; margin-bottom: 30px; font-size: 0.9rem; }
 
-        /* The New Back Button */
         .back-nav { display: flex; justify-content: center; margin-bottom: 20px; }
         .back-btn { padding: 10px 20px; border-radius: 20px; border: 1px solid #fbbf24; background: transparent; color: #fbbf24; cursor: pointer; text-decoration: none; font-size: 0.8rem; font-weight: bold; transition: 0.3s;}
-        .back-btn:hover { background: rgba(251, 191, 36, 0.1); }
-
+        
         .section-label { font-size: 0.8rem; text-transform: uppercase; color: #fbbf24; letter-spacing: 1px; margin-bottom: 10px; font-weight: bold; margin-top: 20px; }
         
         .agency-picker { display: flex; gap: 10px; margin-bottom: 30px; }
@@ -23,18 +21,20 @@
         .agency-btn.active[data-type="FIRE"] { border-color: #ef4444; color: #ef4444; background: rgba(239, 68, 68, 0.1); }
         .agency-btn.active[data-type="EMS"] { border-color: #ffffff; color: #ffffff; background: rgba(255, 255, 255, 0.1); }
 
-        .prompt-card { background: #111111; border: 1px solid #334155; border-radius: 16px; padding: 20px; margin-bottom: 20px; transition: 0.3s; }
+        .prompt-card { background: #111111; border: 1px solid #334155; border-radius: 16px; padding: 20px; margin-bottom: 25px; transition: 0.3s; }
         .prompt-card.recorded { border-color: #22c55e; } 
         .prompt-card.recording { border-color: #fbbf24; box-shadow: 0 0 15px rgba(251, 191, 36, 0.2); }
         .prompt-title { font-weight: bold; margin-bottom: 15px; font-size: 1.05rem; line-height: 1.4; }
         
-        .controls { display: flex; gap: 10px; }
+        .controls { display: flex; gap: 10px; margin-bottom: 15px; }
         .rec-btn { flex: 2; padding: 12px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; background: #fbbf24; color: #000; }
         .stop-btn { flex: 1; padding: 12px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; background: #ef4444; color: white; display: none; }
         .preview-btn { flex: 1; padding: 12px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; background: #475569; color: white; display: none; }
 
-        .text-area { width: 100%; background: #111111; border: 1px solid #334155; border-radius: 12px; padding: 15px; color: white; font-family: inherit; resize: none; margin-bottom: 20px; box-sizing: border-box; }
-        .submit-btn { width: 100%; padding: 20px; border-radius: 12px; border: none; background: #fbbf24; color: #000; font-size: 1.2rem; font-weight: bold; cursor: pointer; margin-top: 20px; }
+        .prompt-textarea { width: 100%; background: #000; border: 1px solid #334155; border-radius: 8px; padding: 12px; color: white; font-family: inherit; resize: none; box-sizing: border-box; font-size: 0.9rem; }
+        .prompt-textarea:focus { border-color: #fbbf24; outline: none; }
+
+        .submit-btn { width: 100%; padding: 20px; border-radius: 12px; border: none; background: #fbbf24; color: #000; font-size: 1.2rem; font-weight: bold; cursor: pointer; margin-top: 10px; }
         .submit-btn:disabled { background: #334155; color: #64748b; cursor: not-allowed; }
         #status { text-align: center; margin-top: 15px; color: #fbbf24; font-weight: bold; }
     </style>
@@ -42,13 +42,10 @@
 <body>
 
 <div class="container">
-    
-    <div class="back-nav">
-        <a href="index.html" class="back-btn">← BACK TO HOME</a>
-    </div>
+    <div class="back-nav"><a href="index.html" class="back-btn">← BACK TO HOME</a></div>
 
     <h1>Record Your Message</h1>
-    <p class="sub-text">You can record multiple prompts or type a note before submitting.</p>
+    <p class="sub-text">Speak or type your appreciation for each prompt below.</p>
 
     <div class="section-label">1. Who is sending this?</div>
     <div class="agency-picker">
@@ -66,6 +63,7 @@
             <button class="stop-btn" id="btn-stop-1" onclick="stopRec(1)">Stop</button>
             <button class="preview-btn" id="btn-prev-1" onclick="playPrev(1)">Preview</button>
         </div>
+        <textarea class="prompt-textarea" id="text-1" rows="3" placeholder="...or type your message here"></textarea>
     </div>
 
     <div class="prompt-card" id="card-2">
@@ -75,6 +73,7 @@
             <button class="stop-btn" id="btn-stop-2" onclick="stopRec(2)">Stop</button>
             <button class="preview-btn" id="btn-prev-2" onclick="playPrev(2)">Preview</button>
         </div>
+        <textarea class="prompt-textarea" id="text-2" rows="3" placeholder="...or type your story here"></textarea>
     </div>
 
     <div class="prompt-card" id="card-3">
@@ -84,10 +83,8 @@
             <button class="stop-btn" id="btn-stop-3" onclick="stopRec(3)">Stop</button>
             <button class="preview-btn" id="btn-prev-3" onclick="playPrev(3)">Preview</button>
         </div>
+        <textarea class="prompt-textarea" id="text-3" rows="3" placeholder="...or type your response here"></textarea>
     </div>
-
-    <div class="section-label">3. Or Leave a Written Note</div>
-    <textarea class="text-area" id="noteText" rows="4" placeholder="Type a general message here..."></textarea>
 
     <button class="submit-btn" id="submitAll" onclick="finalSubmit()">Submit to the Link</button>
     <div id="status">Ready...</div>
@@ -115,8 +112,6 @@
     let mediaRecorder;
     let audioChunks = [];
     let selectedAgency = "";
-    let currentId = null;
-    
     const audioBlobs = {}; 
 
     document.querySelectorAll('.agency-btn').forEach(btn => {
@@ -128,7 +123,6 @@
     });
 
     window.startRec = async (id) => {
-        currentId = id;
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
         mediaRecorder = new MediaRecorder(stream);
         audioChunks = [];
@@ -143,4 +137,75 @@
         mediaRecorder.start();
         document.getElementById(`card-${id}`).classList.add('recording');
         document.getElementById(`btn-rec-${id}`).style.display = 'none';
-        document.getElementById(`btn-stop-${id}`).
+        document.getElementById(`btn-stop-${id}`).style.display = 'block';
+    };
+
+    window.stopRec = (id) => {
+        mediaRecorder.stop();
+        document.getElementById(`card-${id}`).classList.remove('recording');
+        document.getElementById(`btn-stop-${id}`).style.display = 'none';
+        document.getElementById(`btn-rec-${id}`).innerText = "Redo Recording";
+        document.getElementById(`btn-rec-${id}`).style.display = 'block';
+    };
+
+    window.playPrev = (id) => {
+        if (audioBlobs[id]) {
+            const audioUrl = URL.createObjectURL(audioBlobs[id]);
+            new Audio(audioUrl).play();
+        }
+    };
+
+    window.finalSubmit = async () => {
+        if (!selectedAgency) { alert("Select your agency first!"); return; }
+        
+        const submitBtn = document.getElementById('submitAll');
+        const status = document.getElementById('status');
+        let totalSent = 0;
+
+        submitBtn.disabled = true;
+        status.innerText = "Uploading to the Link...";
+
+        try {
+            for (let i = 1; i <= 3; i++) {
+                const promptTitle = document.querySelector(`#card-${i} .prompt-title`).innerText;
+                const note = document.getElementById(`text-${i}`).value.trim();
+                const audio = audioBlobs[i];
+
+                if (audio || note !== "") {
+                    let url = "";
+                    if (audio) {
+                        const fileName = `voice_${Date.now()}_${i}.webm`;
+                        const storageRef = ref(storage, 'audios/' + fileName);
+                        const snapshot = await uploadBytes(storageRef, audio);
+                        url = await getDownloadURL(snapshot.ref);
+                    }
+
+                    await addDoc(collection(db, "messages"), {
+                        agency: selectedAgency,
+                        prompt: promptTitle,
+                        audioUrl: url,
+                        textNote: note,
+                        timestamp: serverTimestamp()
+                    });
+                    totalSent++;
+                }
+            }
+
+            if (totalSent === 0) {
+                alert("Please share something before submitting!");
+                submitBtn.disabled = false;
+                status.innerText = "Ready...";
+                return;
+            }
+
+            status.innerText = "Success! Thank you for honoring the Link.";
+            setTimeout(() => window.location.href = "index.html", 2000);
+        } catch (e) {
+            console.error(e);
+            status.innerText = "Error. Please try again.";
+            submitBtn.disabled = false;
+        }
+    };
+</script>
+</body>
+</html>
