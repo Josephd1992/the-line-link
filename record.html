@@ -7,8 +7,14 @@
     <style>
         body { font-family: 'Segoe UI', sans-serif; background: #000000; color: white; padding: 20px; display: flex; justify-content: center; margin: 0; }
         .container { max-width: 500px; width: 100%; padding-bottom: 50px; }
-        h1 { color: #fbbf24; text-align: center; margin-bottom: 10px; }
+        h1 { color: #fbbf24; text-align: center; margin-bottom: 10px; margin-top: 10px;}
         .sub-text { text-align: center; color: #94a3b8; margin-bottom: 30px; font-size: 0.9rem; }
+
+        /* The New Back Button */
+        .back-nav { display: flex; justify-content: center; margin-bottom: 20px; }
+        .back-btn { padding: 10px 20px; border-radius: 20px; border: 1px solid #fbbf24; background: transparent; color: #fbbf24; cursor: pointer; text-decoration: none; font-size: 0.8rem; font-weight: bold; transition: 0.3s;}
+        .back-btn:hover { background: rgba(251, 191, 36, 0.1); }
+
         .section-label { font-size: 0.8rem; text-transform: uppercase; color: #fbbf24; letter-spacing: 1px; margin-bottom: 10px; font-weight: bold; margin-top: 20px; }
         
         .agency-picker { display: flex; gap: 10px; margin-bottom: 30px; }
@@ -18,7 +24,7 @@
         .agency-btn.active[data-type="EMS"] { border-color: #ffffff; color: #ffffff; background: rgba(255, 255, 255, 0.1); }
 
         .prompt-card { background: #111111; border: 1px solid #334155; border-radius: 16px; padding: 20px; margin-bottom: 20px; transition: 0.3s; }
-        .prompt-card.recorded { border-color: #22c55e; } /* Green border when recorded */
+        .prompt-card.recorded { border-color: #22c55e; } 
         .prompt-card.recording { border-color: #fbbf24; box-shadow: 0 0 15px rgba(251, 191, 36, 0.2); }
         .prompt-title { font-weight: bold; margin-bottom: 15px; font-size: 1.05rem; line-height: 1.4; }
         
@@ -36,6 +42,11 @@
 <body>
 
 <div class="container">
+    
+    <div class="back-nav">
+        <a href="index.html" class="back-btn">← BACK TO HOME</a>
+    </div>
+
     <h1>Record Your Message</h1>
     <p class="sub-text">You can record multiple prompts or type a note before submitting.</p>
 
@@ -106,7 +117,6 @@
     let selectedAgency = "";
     let currentId = null;
     
-    // VAULT: Stores blobs for each prompt card
     const audioBlobs = {}; 
 
     document.querySelectorAll('.agency-btn').forEach(btn => {
@@ -133,73 +143,4 @@
         mediaRecorder.start();
         document.getElementById(`card-${id}`).classList.add('recording');
         document.getElementById(`btn-rec-${id}`).style.display = 'none';
-        document.getElementById(`btn-stop-${id}`).style.display = 'block';
-    };
-
-    window.stopRec = (id) => {
-        mediaRecorder.stop();
-        document.getElementById(`card-${id}`).classList.remove('recording');
-        document.getElementById(`btn-stop-${id}`).style.display = 'none';
-        document.getElementById(`btn-rec-${id}`).innerText = "Redo Recording";
-        document.getElementById(`btn-rec-${id}`).style.display = 'block';
-    };
-
-    window.playPrev = (id) => {
-        if (audioBlobs[id]) {
-            const audioUrl = URL.createObjectURL(audioBlobs[id]);
-            new Audio(audioUrl).play();
-        }
-    };
-
-    window.finalSubmit = async () => {
-        const note = document.getElementById('noteText').value;
-        const hasAudio = Object.keys(audioBlobs).length > 0;
-
-        if (!selectedAgency) { alert("Select your agency first!"); return; }
-        if (!hasAudio && !note) { alert("Please record something or type a note."); return; }
-
-        const submitBtn = document.getElementById('submitAll');
-        const status = document.getElementById('status');
-        submitBtn.disabled = true;
-        status.innerText = "Uploading all entries...";
-
-        try {
-            // 1. Upload each voice recording as its own document
-            for (const id in audioBlobs) {
-                const promptTitle = document.querySelector(`#card-${id} .prompt-title`).innerText;
-                const fileName = `voice_${Date.now()}_${id}.webm`;
-                const storageRef = ref(storage, 'audios/' + fileName);
-                const snapshot = await uploadBytes(storageRef, audioBlobs[id]);
-                const url = await getDownloadURL(snapshot.ref);
-
-                await addDoc(collection(db, "messages"), {
-                    agency: selectedAgency,
-                    prompt: promptTitle,
-                    audioUrl: url,
-                    textNote: "",
-                    timestamp: serverTimestamp()
-                });
-            }
-
-            // 2. Upload the written note as its own document (if it exists)
-            if (note.trim() !== "") {
-                await addDoc(collection(db, "messages"), {
-                    agency: selectedAgency,
-                    prompt: "Written Appreciation",
-                    audioUrl: "",
-                    textNote: note,
-                    timestamp: serverTimestamp()
-                });
-            }
-
-            status.innerText = "Success! Everything sent.";
-            setTimeout(() => window.location.href = "index.html", 2000);
-        } catch (e) {
-            console.error(e);
-            status.innerText = "Error. Try again.";
-            submitBtn.disabled = false;
-        }
-    };
-</script>
-</body>
-</html>
+        document.getElementById(`btn-stop-${id}`).
