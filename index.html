@@ -5,130 +5,57 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>The Gold Line Link</title>
     <style>
-        body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            background-color: #000000; 
-            color: #ffffff; 
-            margin: 0; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            min-height: 100vh;
-            padding: 20px;
-        }
+        body { font-family: 'Segoe UI', sans-serif; background: #000; color: white; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; text-align: center; }
+        .container { max-width: 400px; padding: 20px; }
+        .logo { width: 150px; margin-bottom: 20px; }
+        h1 { color: #fbbf24; margin-bottom: 10px; font-size: 2rem; }
+        p { color: #94a3b8; margin-bottom: 30px; }
+        
+        .btn { display: block; width: 100%; padding: 15px; margin-bottom: 15px; border-radius: 12px; text-decoration: none; font-weight: bold; font-size: 1.1rem; transition: 0.3s; box-sizing: border-box;}
+        .btn-gold { background: #fbbf24; color: #000; }
+        .btn-outline { border: 1px solid #fbbf24; color: #fbbf24; }
+        .btn-info { border: 1px solid #475569; color: #94a3b8; font-size: 0.9rem; }
 
-        .container { 
-            max-width: 500px; 
-            width: 100%; 
-            background: #000000; 
-            padding: 40px; 
-            border-radius: 20px; 
-            border: 2px solid #fbbf24; 
-            box-shadow: 0 0 30px rgba(251, 191, 36, 0.15);
-            text-align: center;
-        }
-
-        .header-tag {
-            color: #fbbf24;
-            font-size: 0.8rem;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            margin-bottom: 10px;
-            font-weight: bold;
-        }
-
-        h1 { 
-            font-size: 2.2rem; 
-            margin: 0 0 20px 0; 
-            color: #ffffff;
-            letter-spacing: -1px;
-        }
-
-        .mission-box {
-            background: #111111;
-            padding: 25px;
-            border-radius: 12px;
-            margin-bottom: 30px;
-            border-left: 4px solid #fbbf24;
-            text-align: left;
-        }
-
-        .mission-box p {
-            font-size: 1rem;
-            line-height: 1.6;
-            color: #cbd5e1;
-            margin: 0;
-        }
-
-        .btn-container {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .btn { 
-            display: block; 
-            padding: 20px; 
-            font-size: 1.1rem; 
-            font-weight: bold; 
-            text-decoration: none; 
-            border-radius: 12px; 
-            transition: all 0.3s ease;
-        }
-
-        .btn-record { 
-            background: #fbbf24; 
-            color: #000000; 
-        }
-        .btn-record:hover {
-            background: #f59e0b;
-            transform: translateY(-2px);
-        }
-
-        .btn-listen { 
-            background: transparent; 
-            color: #fbbf24; 
-            border: 2px solid #fbbf24;
-        }
-        .btn-listen:hover {
-            background: rgba(251, 191, 36, 0.1);
-            transform: translateY(-2px);
-        }
-
-        .footer-note {
-            margin-top: 30px;
-            font-size: 0.75rem;
-            color: #475569;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            line-height: 1.5;
-        }
+        /* Modal Styles */
+        .modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); align-items: center; justify-content: center; }
+        .modal-content { background: #111; border: 1px solid #334155; padding: 30px; border-radius: 20px; max-width: 85%; text-align: left; position: relative; }
+        .modal-content h2 { color: #fbbf24; margin-top: 0; }
+        .modal-content ul { padding-left: 20px; color: #e2e8f0; line-height: 1.6; }
+        .close-modal { display: block; text-align: center; margin-top: 20px; color: #fbbf24; font-weight: bold; cursor: pointer; text-transform: uppercase; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div class="header-tag">Telecommunicators Week 2026</div>
+    <img src="your-badge-logo.png" class="logo" alt="PVRCC Logo">
     <h1>The Gold Line Link</h1>
+    <p>Honoring the voices behind the radio for Dispatcher Appreciation Week.</p>
 
-    <div class="mission-box">
-        <p>
-            <strong>Our Intention:</strong> Behind every calm radio transmission is a person holding the line together. 
-            This gallery is a private space for the field to share their gratitude and for dispatchers to hear the 
-            impact they make every single shift.
-        </p>
-    </div>
+    <a href="record.html" class="btn btn-gold">RECORD A MESSAGE</a>
+    <a href="listen.html" class="btn btn-outline">LISTEN TO THE LINK</a>
+    <div class="btn btn-info" onclick="toggleModal()">HOW IT WORKS / PRIVACY</div>
+</div>
 
-    <div class="btn-container">
-        <a href="record.html" class="btn btn-record">Share Appreciation</a>
-        <a href="listen.html" class="btn btn-listen">Hear the Impact</a>
-    </div>
-
-    <div class="footer-note">
-        Official Agency Resource<br>
-        For Internal Use Only • No Protected Information
+<div id="howToModal" class="modal">
+    <div class="modal-content">
+        <h2>How It Works</h2>
+        <ul>
+            <li><strong>Select:</strong> Choose your agency (Law, Fire, or EMS).</li>
+            <li><strong>Record:</strong> Pick a prompt and share a story or word of thanks.</li>
+            <li><strong>Review:</strong> Preview your audio before you hit submit.</li>
+            <li><strong>Archive:</strong> Your message joins the Appreciation Gallery for our dispatchers to hear.</li>
+        </ul>
+        <p style="font-size: 0.8rem; color: #64748b;">Note: Audio is stored securely in the PVRCC private gallery. Please keep messages professional and respectful of HIPAA/CJIS guidelines.</p>
+        <span class="close-modal" onclick="toggleModal()">Got it</span>
     </div>
 </div>
+
+<script>
+    function toggleModal() {
+        const modal = document.getElementById('howToModal');
+        modal.style.display = (modal.style.display === 'flex') ? 'none' : 'flex';
+    }
+</script>
 
 </body>
 </html>
