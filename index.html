@@ -3,17 +3,132 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Line Link - Home</title>
+    <title>The Gold Line Link</title>
     <style>
-        body { font-family: sans-serif; text-align: center; background: #0f172a; color: white; padding: 50px; }
-        .btn { display: block; padding: 20px; margin: 20px auto; width: 250px; background: #38bdf8; color: white; text-decoration: none; border-radius: 12px; font-weight: bold; }
-        .listen { background: #fbbf24; color: #1e293b; }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background-color: #000000; 
+            color: #ffffff; 
+            margin: 0; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container { 
+            max-width: 500px; 
+            width: 100%; 
+            background: #000000; 
+            padding: 40px; 
+            border-radius: 20px; 
+            border: 2px solid #fbbf24; 
+            box-shadow: 0 0 30px rgba(251, 191, 36, 0.15);
+            text-align: center;
+        }
+
+        .header-tag {
+            color: #fbbf24;
+            font-size: 0.8rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        h1 { 
+            font-size: 2.2rem; 
+            margin: 0 0 20px 0; 
+            color: #ffffff;
+            letter-spacing: -1px;
+        }
+
+        .mission-box {
+            background: #111111;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            border-left: 4px solid #fbbf24;
+            text-align: left;
+        }
+
+        .mission-box p {
+            font-size: 1rem;
+            line-height: 1.6;
+            color: #cbd5e1;
+            margin: 0;
+        }
+
+        .btn-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .btn { 
+            display: block; 
+            padding: 20px; 
+            font-size: 1.1rem; 
+            font-weight: bold; 
+            text-decoration: none; 
+            border-radius: 12px; 
+            transition: all 0.3s ease;
+        }
+
+        .btn-record { 
+            background: #fbbf24; 
+            color: #000000; 
+        }
+        .btn-record:hover {
+            background: #f59e0b;
+            transform: translateY(-2px);
+        }
+
+        .btn-listen { 
+            background: transparent; 
+            color: #fbbf24; 
+            border: 2px solid #fbbf24;
+        }
+        .btn-listen:hover {
+            background: rgba(251, 191, 36, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .footer-note {
+            margin-top: 30px;
+            font-size: 0.75rem;
+            color: #475569;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            line-height: 1.5;
+        }
     </style>
 </head>
 <body>
-    <h1>The Line Link</h1>
-    <p>Choose an option below:</p>
-    <a href="record.html" class="btn">Leave a Message</a>
-    <a href="listen.html" class="btn listen">Hear a Message</a>
+
+<div class="container">
+    <div class="header-tag">Telecommunicators Week 2026</div>
+    <h1>The Gold Line Link</h1>
+
+    <div class="mission-box">
+        <p>
+            <strong>Our Intention:</strong> Behind every calm radio transmission is a person holding the line together. 
+            This gallery is a private space for the field to share their gratitude and for dispatchers to hear the 
+            impact they make every single shift.
+        </p>
+    </div>
+
+    <div class="btn-container">
+        <a href="record.html" class="btn btn-record">Share Appreciation</a>
+        <a href="listen.html" class="btn btn-listen">Hear the Impact</a>
+    </div>
+
+    <div class="footer-note">
+        Official Agency Resource<br>
+        For Internal Use Only • No Protected Information
+    </div>
+</div>
+
 </body>
 </html>
