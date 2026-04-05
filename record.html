@@ -5,33 +5,33 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>The Gold Line Link - Record</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #000000; color: white; padding: 20px; display: flex; justify-content: center; margin: 0; }
+        body { font-family: 'Segoe UI', sans-serif; background: #000; color: white; padding: 20px; display: flex; justify-content: center; margin: 0; }
         .container { max-width: 500px; width: 100%; padding-bottom: 50px; }
-        h1 { color: #fbbf24; text-align: center; margin-bottom: 10px; margin-top: 10px;}
+        h1 { color: #fbbf24; text-align: center; margin-bottom: 10px; }
         .sub-text { text-align: center; color: #94a3b8; margin-bottom: 30px; font-size: 0.9rem; }
-        .back-nav { display: flex; justify-content: center; margin-bottom: 20px; }
-        .back-btn { padding: 10px 20px; border-radius: 20px; border: 1px solid #fbbf24; background: transparent; color: #fbbf24; cursor: pointer; text-decoration: none; font-size: 0.8rem; font-weight: bold; transition: 0.3s;}
-        .section-label { font-size: 0.8rem; text-transform: uppercase; color: #fbbf24; letter-spacing: 1px; margin-bottom: 10px; font-weight: bold; margin-top: 20px; }
         
-        .agency-picker { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 30px; }
-        .agency-btn { padding: 12px; border: 1px solid #334155; border-radius: 8px; background: #111111; color: #94a3b8; cursor: pointer; font-weight: bold; transition: 0.3s; font-size: 0.75rem; }
+        .section-label { font-size: 0.8rem; text-transform: uppercase; color: #fbbf24; letter-spacing: 1px; margin: 20px 0 10px; font-weight: bold; }
         
-        .agency-btn.active[data-type="LEO"] { border-color: #3b82f6; color: #3b82f6; background: rgba(59, 130, 246, 0.1); }
-        .agency-btn.active[data-type="FIRE"] { border-color: #ef4444; color: #ef4444; background: rgba(239, 68, 68, 0.1); }
-        .agency-btn.active[data-type="EMS"] { border-color: #ffffff; color: #ffffff; background: rgba(255, 255, 255, 0.1); }
-        .agency-btn.active[data-type="CITIZEN"] { border-color: #fbbf24; color: #fbbf24; background: rgba(251, 191, 36, 0.1); }
+        /* Agency Picker Grid */
+        .agency-picker { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+        .agency-btn { padding: 15px; border: 1px solid #334155; border-radius: 10px; background: #111; color: #94a3b8; cursor: pointer; font-weight: bold; font-size: 0.75rem; transition: 0.3s; }
+        
+        /* Specific Active Colors */
+        .agency-btn.active[data-type="LEO"] { border-color: #3b82f6; color: #3b82f6; background: rgba(59, 130, 246, 0.1); box-shadow: 0 0 10px rgba(59, 130, 246, 0.2); }
+        .agency-btn.active[data-type="FIRE"] { border-color: #ef4444; color: #ef4444; background: rgba(239, 68, 68, 0.1); box-shadow: 0 0 10px rgba(239, 68, 68, 0.2); }
+        .agency-btn.active[data-type="EMS"] { border-color: #ffffff; color: #ffffff; background: rgba(255, 255, 255, 0.1); box-shadow: 0 0 10px rgba(255, 255, 255, 0.2); }
+        .agency-btn.active[data-type="CITIZEN"] { border-color: #fbbf24; color: #fbbf24; background: rgba(251, 191, 36, 0.1); box-shadow: 0 0 10px rgba(251, 191, 36, 0.2); }
 
-        .prompt-card { background: #111111; border: 1px solid #334155; border-radius: 16px; padding: 20px; margin-bottom: 25px; transition: 0.5s; }
-        .prompt-card.recorded { border-color: #22c55e; } 
-        .prompt-card.recording { border-color: #fbbf24; box-shadow: 0 0 15px rgba(251, 191, 36, 0.2); }
+        .prompt-card { background: #111; border: 1px solid #334155; border-radius: 16px; padding: 20px; margin-bottom: 25px; transition: 0.3s; }
+        .prompt-card.recorded { border-color: #22c55e; }
         .prompt-title { font-weight: bold; margin-bottom: 15px; font-size: 1.05rem; line-height: 1.4; color: #fbbf24; }
         
         .controls { display: flex; gap: 10px; margin-bottom: 15px; }
-        .rec-btn { flex: 2; padding: 12px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; background: #fbbf24; color: #000; }
-        .stop-btn { flex: 1; padding: 12px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; background: #ef4444; color: white; display: none; }
-        .preview-btn { flex: 1; padding: 12px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; background: #475569; color: white; display: none; }
+        .rec-btn { flex: 2; padding: 12px; border-radius: 8px; border: none; font-weight: bold; background: #fbbf24; color: #000; cursor: pointer; }
+        .stop-btn { flex: 1; padding: 12px; border-radius: 8px; border: none; font-weight: bold; background: #ef4444; color: white; display: none; cursor: pointer; }
+        .preview-btn { flex: 1; padding: 12px; border-radius: 8px; border: none; font-weight: bold; background: #475569; color: white; display: none; cursor: pointer; }
 
-        .prompt-textarea { width: 100%; background: #000; border: 1px solid #334155; border-radius: 8px; padding: 12px; color: white; font-family: inherit; resize: none; box-sizing: border-box; font-size: 0.9rem; }
+        .prompt-textarea { width: 100%; background: #000; border: 1px solid #334155; border-radius: 8px; padding: 12px; color: white; font-family: inherit; resize: none; box-sizing: border-box; }
         .submit-btn { width: 100%; padding: 20px; border-radius: 12px; border: none; background: #fbbf24; color: #000; font-size: 1.2rem; font-weight: bold; cursor: pointer; margin-top: 10px; }
         #status { text-align: center; margin-top: 15px; color: #fbbf24; font-weight: bold; }
     </style>
@@ -39,10 +39,8 @@
 <body>
 
 <div class="container">
-    <div class="back-nav"><a href="index.html" class="back-btn">← BACK TO HOME</a></div>
-
     <h1>The Gold Line Link</h1>
-    <p class="sub-text">Honoring the voices that bridge the gap between panic and professional help.</p>
+    <p class="sub-text">Honoring the dispatchers at PVRCC.</p>
 
     <div class="section-label">1. Who is sending this?</div>
     <div class="agency-picker">
@@ -53,42 +51,41 @@
     </div>
 
     <div id="questions-section" style="display:none;">
-        <div class="section-label">2. Share Your Message</div>
+        <div class="section-label">2. Your Message</div>
         
         <div class="prompt-card" id="card-1">
-            <div class="prompt-title" id="title-1">Prompt 1...</div>
+            <div class="prompt-title" id="title-1">Prompt 1</div>
             <div class="controls">
                 <button class="rec-btn" id="btn-rec-1" onclick="startRec(1)">Record Voice</button>
                 <button class="stop-btn" id="btn-stop-1" onclick="stopRec(1)">Stop</button>
                 <button class="preview-btn" id="btn-prev-1" onclick="playPrev(1)">Preview</button>
             </div>
-            <textarea class="prompt-textarea" id="text-1" rows="3" placeholder="Type your response..."></textarea>
+            <textarea class="prompt-textarea" id="text-1" rows="3" placeholder="Type here..."></textarea>
         </div>
 
         <div class="prompt-card" id="card-2">
-            <div class="prompt-title" id="title-2">Prompt 2...</div>
+            <div class="prompt-title" id="title-2">Prompt 2</div>
             <div class="controls">
                 <button class="rec-btn" id="btn-rec-2" onclick="startRec(2)">Record Voice</button>
                 <button class="stop-btn" id="btn-stop-2" onclick="stopRec(2)">Stop</button>
                 <button class="preview-btn" id="btn-prev-2" onclick="playPrev(2)">Preview</button>
             </div>
-            <textarea class="prompt-textarea" id="text-2" rows="3" placeholder="Type your response..."></textarea>
+            <textarea class="prompt-textarea" id="text-2" rows="3" placeholder="Type here..."></textarea>
         </div>
 
         <div class="prompt-card" id="card-3">
             <div class="prompt-title">The "Open Mic" (Freestyle)</div>
-            <p style="font-size: 0.85rem; color: #94a3b8; margin-top: -10px; margin-bottom: 10px;">Got something else on your mind? A funny story, a quick shout-out, or just a generic thank you? Leave it here.</p>
             <div class="controls">
                 <button class="rec-btn" id="btn-rec-3" onclick="startRec(3)">Record Voice</button>
                 <button class="stop-btn" id="btn-stop-3" onclick="stopRec(3)">Stop</button>
                 <button class="preview-btn" id="btn-prev-3" onclick="playPrev(3)">Preview</button>
             </div>
-            <textarea class="prompt-textarea" id="text-3" rows="3" placeholder="Type your freestyle message..."></textarea>
+            <textarea class="prompt-textarea" id="text-3" rows="3" placeholder="Type freestyle here..."></textarea>
         </div>
 
         <button class="submit-btn" id="submitAll" onclick="finalSubmit()">Submit to the Link</button>
     </div>
-    <div id="status">Select an agency above to reveal your prompts.</div>
+    <div id="status">Select an agency above to begin.</div>
 </div>
 
 <script type="module">
@@ -110,105 +107,83 @@
     const db = getFirestore(app);
     const storage = getStorage(app);
 
-    // Updated Prompt Map
     const promptMap = {
-        'LEO': [
-            "What should dispatchers know about how much you appreciate them being your second set of eyes and ears?",
-            "Tell us about a call where a dispatcher's radio work helped you maintain control or safety."
-        ],
-        'FIRE': [
-            "How does it feel to hear that calm voice coordinating resources while you're suiting up or on-scene?",
-            "Share a moment where dispatch coordination made a life-saving difference in a fire or rescue operation."
-        ],
-        'EMS': [
-            "How do pre-arrival instructions from dispatch change the outcome before you even arrive?",
-            "Tell us about a medical emergency where dispatch played a key role in the patient's survival."
-        ],
-        'CITIZEN': [
-            "What do you wish you could tell the person who answered the phone during your emergency?",
-            "Share a story of a time a 911 dispatcher made you feel safe during a terrifying moment."
-        ]
+        'LEO': ["What should dispatchers know about their role in your safety?", "Tell us about a call where dispatch was your lifeline."],
+        'FIRE': ["How does a calm dispatcher change the scene for you?", "Share a moment where dispatch made a life-saving difference."],
+        'EMS': ["How do pre-arrival instructions help you on a call?", "Tell us about a medical emergency where dispatch played a key role."],
+        'CITIZEN': ["What would you like to say to those who answer your 911 calls?", "Share a story of a time 911 dispatch was there for you."]
     };
 
     let mediaRecorder;
     let audioChunks = [];
     let selectedAgency = "";
-    const audioBlobs = {}; 
+    const audioBlobs = {};
 
+    // THE FIX: Explicitly binding the click event to swap colors AND text
     document.querySelectorAll('.agency-btn').forEach(btn => {
-        btn.onclick = () => {
+        btn.addEventListener('click', () => {
+            // Remove active class from all
             document.querySelectorAll('.agency-btn').forEach(b => b.classList.remove('active'));
+            
+            // Add active class to clicked
             btn.classList.add('active');
             selectedAgency = btn.getAttribute('data-type');
             
+            // Swap Text
             document.getElementById('title-1').innerText = promptMap[selectedAgency][0];
             document.getElementById('title-2').innerText = promptMap[selectedAgency][1];
             
+            // Show Section
             document.getElementById('questions-section').style.display = 'block';
             document.getElementById('status').innerText = "Ready.";
-        };
+        });
     });
 
     window.startRec = async (id) => {
-        try {
-            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            mediaRecorder = new MediaRecorder(stream);
-            audioChunks = [];
-            mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
-            mediaRecorder.onstop = () => {
-                audioBlobs[id] = new Blob(audioChunks, { type: 'audio/webm' });
-                document.getElementById(`btn-prev-${id}`).style.display = 'block';
-                document.getElementById(`card-${id}`).classList.add('recorded');
-            };
-            mediaRecorder.start();
-            document.getElementById(`card-${id}`).classList.add('recording');
-            document.getElementById(`btn-rec-${id}`).style.display = 'none';
-            document.getElementById(`btn-stop-${id}`).style.display = 'block';
-        } catch (err) {
-            alert("Mic access is required to record.");
-        }
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        mediaRecorder = new MediaRecorder(stream);
+        audioChunks = [];
+        mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+        mediaRecorder.onstop = () => {
+            audioBlobs[id] = new Blob(audioChunks, { type: 'audio/webm' });
+            document.getElementById(`btn-prev-${id}`).style.display = 'block';
+            document.getElementById(`card-${id}`).classList.add('recorded');
+        };
+        mediaRecorder.start();
+        document.getElementById(`btn-rec-${id}`).style.display = 'none';
+        document.getElementById(`btn-stop-${id}`).style.display = 'block';
     };
 
     window.stopRec = (id) => {
-        if (mediaRecorder) {
-            mediaRecorder.stop();
-            document.getElementById(`card-${id}`).classList.remove('recording');
-            document.getElementById(`btn-stop-${id}`).style.display = 'none';
-            document.getElementById(`btn-rec-${id}`).style.display = 'block';
-            document.getElementById(`btn-rec-${id}`).innerText = "Redo Recording";
-        }
+        mediaRecorder.stop();
+        document.getElementById(`btn-stop-${id}`).style.display = 'none';
+        document.getElementById(`btn-rec-${id}`).style.display = 'block';
+        document.getElementById(`btn-rec-${id}`).innerText = "Redo";
     };
 
     window.playPrev = (id) => {
         if (audioBlobs[id]) {
-            const audioUrl = URL.createObjectURL(audioBlobs[id]);
-            new Audio(audioUrl).play();
+            const url = URL.createObjectURL(audioBlobs[id]);
+            new Audio(url).play();
         }
     };
 
     window.finalSubmit = async () => {
-        const submitBtn = document.getElementById('submitAll');
-        submitBtn.disabled = true;
-        document.getElementById('status').innerText = "Submitting...";
-
+        document.getElementById('status').innerText = "Uploading...";
         try {
             for (let i = 1; i <= 3; i++) {
-                const titleElement = document.getElementById(`title-${i}`) || { innerText: "Open Mic Freestyle" };
-                const promptTitle = titleElement.innerText;
                 const note = document.getElementById(`text-${i}`).value.trim();
                 const audio = audioBlobs[i];
-
                 if (audio || note !== "") {
                     let url = "";
                     if (audio) {
-                        const fileName = `voice_${Date.now()}_${i}.webm`;
-                        const storageRef = ref(storage, 'audios/' + fileName);
-                        const snapshot = await uploadBytes(storageRef, audio);
-                        url = await getDownloadURL(snapshot.ref);
+                        const fileRef = ref(storage, `audios/${Date.now()}_${i}.webm`);
+                        const snap = await uploadBytes(fileRef, audio);
+                        url = await getDownloadURL(snap.ref);
                     }
                     await addDoc(collection(db, "messages"), {
                         agency: selectedAgency,
-                        prompt: promptTitle,
+                        prompt: i === 3 ? "Freestyle" : promptMap[selectedAgency][i-1],
                         audioUrl: url,
                         textNote: note,
                         approved: false,
@@ -216,11 +191,10 @@
                     });
                 }
             }
-            alert("Success! Your appreciation has been sent for review.");
+            alert("Sent for review!");
             window.location.href = "index.html";
         } catch (e) {
-            alert("Submission error. Try again.");
-            submitBtn.disabled = false;
+            alert("Error. Try again.");
         }
     };
 </script>
