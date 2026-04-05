@@ -12,19 +12,17 @@
         
         .section-label { font-size: 0.8rem; text-transform: uppercase; color: #fbbf24; letter-spacing: 1px; margin: 20px 0 10px; font-weight: bold; }
         
-        /* Agency Picker */
         .agency-picker { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
         .agency-btn { padding: 15px; border: 1px solid #334155; border-radius: 10px; background: #111; color: #94a3b8; cursor: pointer; font-weight: bold; font-size: 0.75rem; transition: 0.3s; }
         
-        /* Active Colors */
         .agency-btn.active[data-type="LEO"] { border-color: #3b82f6; color: #3b82f6; background: rgba(59, 130, 246, 0.1); }
         .agency-btn.active[data-type="FIRE"] { border-color: #ef4444; color: #ef4444; background: rgba(239, 68, 68, 0.1); }
         .agency-btn.active[data-type="EMS"] { border-color: #ffffff; color: #ffffff; background: rgba(255, 255, 255, 0.1); }
         .agency-btn.active[data-type="CITIZEN"] { border-color: #fbbf24; color: #fbbf24; background: rgba(251, 191, 36, 0.1); }
 
         .prompt-card { background: #111; border: 1px solid #334155; border-radius: 16px; padding: 20px; margin-bottom: 25px; }
-        .prompt-title { font-weight: bold; margin-bottom: 15px; font-size: 1.05rem; line-height: 1.4; color: #fbbf24; }
-        
+        .prompt-title { font-weight: bold; margin-bottom: 10px; font-size: 1.05rem; line-height: 1.4; color: #fbbf24; }
+        .prompt-instruction { font-size: 0.85rem; color: #94a3b8; margin-bottom: 15px; line-height: 1.3; }
         .or-divider { text-align: center; color: #475569; font-size: 0.7rem; font-weight: bold; margin: 10px 0; text-transform: uppercase; letter-spacing: 1px; }
 
         .controls { display: flex; gap: 10px; margin-bottom: 5px; }
@@ -35,7 +33,6 @@
         .prompt-textarea { width: 100%; background: #000; border: 1px solid #334155; border-radius: 8px; padding: 12px; color: white; font-family: inherit; resize: none; box-sizing: border-box; }
         .submit-btn { width: 100%; padding: 20px; border-radius: 12px; border: none; background: #fbbf24; color: #000; font-size: 1.2rem; font-weight: bold; cursor: pointer; margin-top: 10px; }
         #status { text-align: center; margin-top: 15px; color: #fbbf24; font-weight: bold; }
-        
         .back-nav { margin-bottom: 20px; text-align: center; }
         .back-btn { color: #fbbf24; text-decoration: none; border: 1px solid #fbbf24; padding: 5px 15px; border-radius: 20px; font-size: 0.8rem; }
     </style>
@@ -82,6 +79,7 @@
 
         <div class="prompt-card">
             <div class="prompt-title">The "Open Mic" (Freestyle)</div>
+            <div class="prompt-instruction">Have a quick joke, a funny shift story, or just a generic thank you? Leave it here.</div>
             <div class="controls">
                 <button class="rec-btn" id="btn-rec-3" onclick="startRec(3)">Record Voice</button>
                 <button class="stop-btn" id="btn-stop-3" onclick="stopRec(3)">Stop</button>
@@ -97,24 +95,32 @@
 </div>
 
 <script>
-    // These functions work immediately regardless of Firebase status
     const promptMap = {
-        'LEO': ["What should dispatchers know about their role in your safety?", "Tell us about a call where dispatch was your lifeline."],
-        'FIRE': ["How does a calm dispatcher change the scene for you?", "Share a moment where dispatch made a life-saving difference."],
-        'EMS': ["How do pre-arrival instructions help you on a call?", "Tell us about a medical emergency where dispatch played a key role."],
-        'CITIZEN': ["What would you like to say to those who answer your 911 calls?", "Share a story of a time 911 dispatch was there for you."]
+        'LEO': [
+            "What does a dispatcher's role mean to you?", 
+            "Tell us about a call where dispatch was your lifeline."
+        ],
+        'FIRE': [
+            "What does a dispatcher's role mean to you?", 
+            "Share a moment where dispatch coordination made a life-saving difference."
+        ],
+        'EMS': [
+            "What does a dispatcher's role mean to you?", 
+            "Tell us about a medical emergency where dispatch played a key role."
+        ],
+        'CITIZEN': [
+            "What would you like to say to those who answer your 911 calls?", 
+            "Share a story of a time 911 dispatch was there for you."
+        ]
     };
 
     let selectedAgency = "";
-    
     function setAgency(type, btn) {
         document.querySelectorAll('.agency-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         selectedAgency = type;
-        
         document.getElementById('title-1').innerText = promptMap[type][0];
         document.getElementById('title-2').innerText = promptMap[type][1];
-        
         document.getElementById('questions-section').style.display = 'block';
         document.getElementById('status').innerText = "Ready.";
     }
@@ -176,8 +182,7 @@
     };
 
     window.finalSubmit = async () => {
-        const status = document.getElementById('status');
-        status.innerText = "Uploading appreciation...";
+        document.getElementById('status').innerText = "Uploading appreciation...";
         try {
             for (let i = 1; i <= 3; i++) {
                 const note = document.getElementById(`text-${i}`).value.trim();
@@ -203,7 +208,6 @@
             window.location.href = "index.html";
         } catch(e) { 
             alert("Submission error. Please try again."); 
-            status.innerText = "Error.";
         }
     };
 </script>
