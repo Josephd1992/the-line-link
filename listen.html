@@ -7,24 +7,47 @@
     <style>
         body { font-family: 'Segoe UI', sans-serif; background: #000; color: white; padding: 20px; display: flex; justify-content: center; margin: 0; }
         .container { max-width: 500px; width: 100%; }
-        h1 { color: #fbbf24; text-align: center; }
-        .message-card { background: #111; border: 1px solid #334155; border-radius: 12px; padding: 15px; margin-bottom: 12px; }
-        .pending-card { border: 1px dashed #fbbf24; opacity: 0.8; }
-        .card-header { font-size: 0.7rem; color: #fbbf24; margin-bottom: 5px; }
-        .prompt-preview { font-weight: bold; font-size: 0.9rem; margin-bottom: 10px; }
-        .card-content { border-top: 1px solid #334155; padding-top: 10px; }
-        audio { width: 100%; margin-bottom: 10px; }
-        .admin-actions { margin-top: 10px; display: flex; gap: 10px; }
-        .btn-adm { padding: 5px 10px; border: none; border-radius: 5px; cursor: pointer; font-size: 0.7rem; font-weight: bold; }
+        h1 { color: #fbbf24; text-align: center; margin-bottom: 30px; }
+        
+        #status { text-align: center; color: #94a3b8; margin-top: 20px; }
+        
+        .message-card { background: #111; border: 1px solid #334155; border-radius: 12px; padding: 15px; margin-bottom: 15px; position: relative; overflow: hidden; transition: 0.3s; cursor: pointer; }
+        .message-card:hover { border-color: #475569; }
+        
+        /* Side Stripes for Agencies */
+        .stripe { position: absolute; left: 0; top: 0; bottom: 0; width: 5px; }
+        .stripe-LEO { background: #3b82f6; }
+        .stripe-FIRE { background: #ef4444; }
+        .stripe-EMS { background: #ffffff; }
+        .stripe-CITIZEN { background: #fbbf24; }
+
+        .pending-card { border: 1px dashed #fbbf24 !important; opacity: 0.8; }
+        
+        .card-header { font-size: 0.7rem; font-weight: bold; text-transform: uppercase; margin-bottom: 8px; display: flex; justify-content: space-between; }
+        .LEO-text { color: #3b82f6; }
+        .FIRE-text { color: #ef4444; }
+        .EMS-text { color: #ffffff; }
+        .CITIZEN-text { color: #fbbf24; }
+
+        .prompt-preview { font-weight: bold; font-size: 0.95rem; line-height: 1.4; margin-bottom: 10px; color: #e2e8f0; }
+        
+        .card-content { border-top: 1px solid #1e293b; padding-top: 12px; margin-top: 10px; }
+        audio { width: 100%; margin-bottom: 10px; height: 35px; }
+        .text-note { font-size: 0.9rem; line-height: 1.5; color: #cbd5e1; white-space: pre-wrap; }
+
+        .admin-actions { margin-top: 15px; display: flex; gap: 10px; border-top: 1px solid #334155; padding-top: 10px; }
+        .btn-adm { flex: 1; padding: 8px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.75rem; }
         .btn-app { background: #22c55e; color: white; }
         .btn-del { background: #ef4444; color: white; }
-        .nav-link { display: block; text-align: center; margin-top: 30px; color: #64748b; text-decoration: none; font-size: 0.8rem; }
+
+        .nav-link { display: block; text-align: center; margin-top: 40px; color: #fbbf24; text-decoration: none; font-weight: bold; font-size: 0.9rem; }
     </style>
 </head>
 <body>
+
 <div class="container">
-    <h1>Appreciation Gallery</h1>
-    <div id="status">Loading messages...</div>
+    <h1>The Link Gallery</h1>
+    <div id="status">Loading appreciation...</div>
     <div id="messageList"></div>
     <a href="index.html" class="nav-link">← BACK TO HOME</a>
 </div>
@@ -58,16 +81,27 @@
         snap.forEach(d => {
             const m = d.data();
             const id = d.id;
+
+            // Only show approved to public. Admins see everything.
             if (!isAdmin && !m.approved) return;
 
             const card = document.createElement('div');
             card.className = `message-card ${!m.approved ? 'pending-card' : ''}`;
+            
+            // Map Agency codes to readable names
+            const agencyNames = { 'LEO': 'Law Enforcement', 'FIRE': 'Fire / Rescue', 'EMS': 'EMS / Medical', 'CITIZEN': 'Community Member' };
+            const friendlyAgency = agencyNames[m.agency] || m.agency;
+
             card.innerHTML = `
-                <div class="card-header">${m.agency} ${!m.approved ? '(PENDING REVIEW)' : ''}</div>
+                <div class="stripe stripe-${m.agency}"></div>
+                <div class="card-header">
+                    <span class="${m.agency}-text">${friendlyAgency}</span>
+                    <span>${!m.approved ? '🔒 PENDING' : ''}</span>
+                </div>
                 <div class="prompt-preview">${m.prompt}</div>
-                <div class="card-content">
+                <div class="card-content" id="content-${id}" style="display: ${isAdmin ? 'block' : 'none'};">
                     ${m.audioUrl ? `<audio controls src="${m.audioUrl}"></audio>` : ''}
-                    ${m.textNote ? `<p>${m.textNote}</p>` : ''}
+                    ${m.textNote ? `<div class="text-note">"${m.textNote}"</div>` : ''}
                     ${isAdmin ? `
                         <div class="admin-actions">
                             <button class="btn-adm btn-app" onclick="manage('${id}', 'app')">APPROVE</button>
@@ -76,15 +110,31 @@
                     ` : ''}
                 </div>
             `;
+
+            // Toggle expand/collapse for public view
+            if (!isAdmin) {
+                card.onclick = () => {
+                    const content = document.getElementById(`content-${id}`);
+                    content.style.display = content.style.display === 'none' ? 'block' : 'none';
+                };
+            }
+
             list.appendChild(card);
         });
     }
 
     window.manage = async (id, act) => {
-        const pin = prompt("Supervisor PIN:");
-        if (pin !== SUPERVISOR_KEY) return alert("Wrong PIN");
-        if (act === 'app') await updateDoc(doc(db, "messages", id), { approved: true });
-        else await deleteDoc(doc(db, "messages", id));
+        const pin = prompt("Supervisor PIN Required:");
+        if (pin !== SUPERVISOR_KEY) return alert("Unauthorized");
+
+        if (act === 'app') {
+            await updateDoc(doc(db, "messages", id), { approved: true });
+            alert("Message published to gallery.");
+        } else {
+            if(confirm("Permanently delete this message?")) {
+                await deleteDoc(doc(db, "messages", id));
+            }
+        }
         location.reload();
     };
 
