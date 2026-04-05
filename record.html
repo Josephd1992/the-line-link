@@ -1,15 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Gold Line Link - Record</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #000000; color: white; padding: 20px; display: flex; justify-content: center; margin: 0; }
+        .container { max-width: 500px; width: 100%; padding-bottom: 50px; }
+        h1 { color: #fbbf24; text-align: center; margin-bottom: 10px; margin-top: 10px;}
+        .sub-text { text-align: center; color: #94a3b8; margin-bottom: 30px; font-size: 0.9rem; }
+
+        .back-nav { display: flex; justify-content: center; margin-bottom: 20px; }
+        .back-btn { padding: 10px 20px; border-radius: 20px; border: 1px solid #fbbf24; background: transparent; color: #fbbf24; cursor: pointer; text-decoration: none; font-size: 0.8rem; font-weight: bold; transition: 0.3s;}
+        
+        .section-label { font-size: 0.8rem; text-transform: uppercase; color: #fbbf24; letter-spacing: 1px; margin-bottom: 10px; font-weight: bold; margin-top: 20px; }
+        
+        .agency-picker { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 30px; }
+        .agency-btn { padding: 12px; border: 1px solid #334155; border-radius: 8px; background: #111111; color: #94a3b8; cursor: pointer; font-weight: bold; transition: 0.3s; font-size: 0.75rem; }
+        .agency-btn.active[data-type="LEO"] { border-color: #3b82f6; color: #3b82f6; background: rgba(59, 130, 246, 0.1); }
+        .agency-btn.active[data-type="FIRE"] { border-color: #ef4444; color: #ef4444; background: rgba(239, 68, 68, 0.1); }
+        .agency-btn.active[data-type="EMS"] { border-color: #ffffff; color: #ffffff; background: rgba(255, 255, 255, 0.1); }
+        .agency-btn.active[data-type="CITIZEN"] { border-color: #fbbf24; color: #fbbf24; background: rgba(251, 191, 36, 0.1); }
+
+        .prompt-card { background: #111111; border: 1px solid #334155; border-radius: 16px; padding: 20px; margin-bottom: 25px; }
+        .prompt-card.recorded { border-color: #22c55e; } 
+        .prompt-card.recording { border-color: #fbbf24; box-shadow: 0 0 15px rgba(251, 191, 36, 0.2); }
+        .prompt-title { font-weight: bold; margin-bottom: 15px; font-size: 1.05rem; line-height: 1.4; }
+        
+        .controls { display: flex; gap: 10px; margin-bottom: 15px; }
+        .rec-btn { flex: 2; padding: 12px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; background: #fbbf24; color: #000; }
+        .stop-btn { flex: 1; padding: 12px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; background: #ef4444; color: white; display: none; }
+        .preview-btn { flex: 1; padding: 12px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; background: #475569; color: white; display: none; }
+
+        .prompt-textarea { width: 100%; background: #000; border: 1px solid #334155; border-radius: 8px; padding: 12px; color: white; font-family: inherit; resize: none; box-sizing: border-box; font-size: 0.9rem; }
+        
+        .submit-btn { width: 100%; padding: 20px; border-radius: 12px; border: none; background: #fbbf24; color: #000; font-size: 1.2rem; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        .submit-btn:disabled { background: #334155; color: #64748b; cursor: not-allowed; }
+        #status { text-align: center; margin-top: 15px; color: #fbbf24; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="back-nav"><a href="index.html" class="back-btn">← BACK TO HOME</a></div>
+
+    <h1>The Gold Line Link</h1>
+    <p class="sub-text">A direct line to thank our 911 dispatchers.</p>
+
+    <div class="section-label">1. Who is sending this?</div>
+    <div class="agency-picker">
+        <button class="agency-btn" data-type="LEO">LAW ENFORCEMENT</button>
+        <button class="agency-btn" data-type="FIRE">FIRE / RESCUE</button>
+        <button class="agency-btn" data-type="EMS">EMS / MEDICAL</button>
+        <button class="agency-btn" data-type="CITIZEN">COMMUNITY MEMBER</button>
+    </div>
+
+    <div class="section-label">2. Your Message of Thanks</div>
+    
+    <div class="prompt-card" id="card-1">
+        <div class="prompt-title">What would you like to say to the dispatchers who answer your calls for help?</div>
+        <div class="controls">
+            <button class="rec-btn" id="btn-rec-1" onclick="startRec(1)">Record Voice</button>
+            <button class="stop-btn" id="btn-stop-1" onclick="stopRec(1)">Stop</button>
+            <button class="preview-btn" id="btn-prev-1" onclick="playPrev(1)">Preview</button>
+        </div>
+        <textarea class="prompt-textarea" id="text-1" rows="3" placeholder="...or type your message here"></textarea>
+    </div>
+
+    <div class="prompt-card" id="card-2">
+        <div class="prompt-title">Do you have a specific story of how a dispatcher helped you during an emergency?</div>
+        <div class="controls">
+            <button class="rec-btn" id="btn-rec-2" onclick="startRec(2)">Record Voice</button>
+            <button class="stop-btn" id="btn-stop-2" onclick="stopRec(2)">Stop</button>
+            <button class="preview-btn" id="btn-prev-2" onclick="playPrev(2)">Preview</button>
+        </div>
+        <textarea class="prompt-textarea" id="text-2" rows="3" placeholder="...or type your story here"></textarea>
+    </div>
+
+    <button class="submit-btn" id="submitAll" onclick="finalSubmit()">Submit Appreciation</button>
+    <div id="status">Ready...</div>
+</div>
+
 <script type="module">
-    // ... Firebase Init Code ...
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
+    import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyC4-eypucZ9FjS4sk4CQgkeNMPyyh4HvcU",
+        authDomain: "the-line-link.firebaseapp.com",
+        projectId: "the-line-link",
+        storageBucket: "the-line-link.firebasestorage.app",
+        messagingSenderId: "378236622341",
+        appId: "1:378236622341:web:6809e3cd491a7e945b2e6c",
+        measurementId: "G-KHPWDYHQRF"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const storage = getStorage(app);
+
+    let mediaRecorder;
+    let audioChunks = [];
+    let selectedAgency = "";
+    const audioBlobs = {}; 
+
+    document.querySelectorAll('.agency-btn').forEach(btn => {
+        btn.onclick = () => {
+            document.querySelectorAll('.agency-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            selectedAgency = btn.getAttribute('data-type');
+        };
+    });
+
+    window.startRec = async (id) => {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            mediaRecorder = new MediaRecorder(stream);
+            audioChunks = [];
+            mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+            mediaRecorder.onstop = () => {
+                audioBlobs[id] = new Blob(audioChunks, { type: 'audio/webm' });
+                document.getElementById(`btn-prev-${id}`).style.display = 'block';
+                document.getElementById(`card-${id}`).classList.add('recorded');
+            };
+            mediaRecorder.start();
+            document.getElementById(`card-${id}`).classList.add('recording');
+            document.getElementById(`btn-rec-${id}`).style.display = 'none';
+            document.getElementById(`btn-stop-${id}`).style.display = 'block';
+        } catch (err) {
+            alert("Microphone access is required to record audio.");
+        }
+    };
+
+    window.stopRec = (id) => {
+        if (mediaRecorder) {
+            mediaRecorder.stop();
+            document.getElementById(`card-${id}`).classList.remove('recording');
+            document.getElementById(`btn-stop-${id}`).style.display = 'none';
+            document.getElementById(`btn-rec-${id}`).innerText = "Redo Recording";
+            document.getElementById(`btn-rec-${id}`).style.display = 'block';
+        }
+    };
+
+    window.playPrev = (id) => {
+        if (audioBlobs[id]) {
+            const audioUrl = URL.createObjectURL(audioBlobs[id]);
+            new Audio(audioUrl).play();
+        }
+    };
 
     window.finalSubmit = async () => {
         if (!selectedAgency) { alert("Please select who you are first!"); return; }
         const submitBtn = document.getElementById('submitAll');
+        const status = document.getElementById('status');
+        let totalSent = 0;
+        
         submitBtn.disabled = true;
+        status.innerText = "Sending your message...";
 
         try {
             for (let i = 1; i <= 2; i++) {
+                const promptTitle = document.querySelector(`#card-${i} .prompt-title`).innerText;
                 const note = document.getElementById(`text-${i}`).value.trim();
                 const audio = audioBlobs[i];
+
                 if (audio || note !== "") {
                     let url = "";
                     if (audio) {
@@ -18,22 +173,31 @@
                         const snapshot = await uploadBytes(storageRef, audio);
                         url = await getDownloadURL(snapshot.ref);
                     }
-                    // IMPORTANT: ADDING THE APPROVED: FALSE FLAG
                     await addDoc(collection(db, "messages"), {
                         agency: selectedAgency,
-                        prompt: document.querySelector(`#card-${i} .prompt-title`).innerText,
+                        prompt: promptTitle,
                         audioUrl: url,
                         textNote: note,
-                        approved: false, 
+                        approved: false,
                         timestamp: serverTimestamp()
                     });
+                    totalSent++;
                 }
             }
-            alert("Sent! Your message will appear in the gallery after supervisor review.");
-            window.location.href = "index.html";
+            if (totalSent === 0) { 
+                alert("Please record or type something first!"); 
+                submitBtn.disabled = false; 
+                status.innerText = "Ready...";
+                return; 
+            }
+            status.innerText = "Success! Message sent for review.";
+            setTimeout(() => window.location.href = "index.html", 2000);
         } catch (e) {
-            alert("Error submitting. Try again.");
+            console.error(e);
+            status.innerText = "Error. Please try again.";
             submitBtn.disabled = false;
         }
     };
 </script>
+</body>
+</html>
