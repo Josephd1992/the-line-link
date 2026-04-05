@@ -12,20 +12,18 @@
         
         .section-label { font-size: 0.8rem; text-transform: uppercase; color: #fbbf24; letter-spacing: 1px; margin: 20px 0 10px; font-weight: bold; }
         
-        /* Agency Picker */
         .agency-picker { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
-        .agency-btn { padding: 15px; border: 1px solid #334155; border-radius: 10px; background: #111; color: #94a3b8; cursor: pointer; font-weight: bold; font-size: 0.75rem; transition: 0.3s; }
+        .agency-btn { padding: 15px; border: 1px solid #334155; border-radius: 10px; background: #111; color: #94a3b8; cursor: pointer; font-weight: bold; font-size: 0.75rem; transition: 0.3s; outline: none; }
         
+        /* Active Colors */
         .agency-btn.active[data-type="LEO"] { border-color: #3b82f6; color: #3b82f6; background: rgba(59, 130, 246, 0.1); }
         .agency-btn.active[data-type="FIRE"] { border-color: #ef4444; color: #ef4444; background: rgba(239, 68, 68, 0.1); }
         .agency-btn.active[data-type="EMS"] { border-color: #ffffff; color: #ffffff; background: rgba(255, 255, 255, 0.1); }
         .agency-btn.active[data-type="CITIZEN"] { border-color: #fbbf24; color: #fbbf24; background: rgba(251, 191, 36, 0.1); }
 
-        .prompt-card { background: #111; border: 1px solid #334155; border-radius: 16px; padding: 20px; margin-bottom: 25px; transition: 0.3s; }
-        .prompt-card.recorded { border-color: #22c55e; }
+        .prompt-card { background: #111; border: 1px solid #334155; border-radius: 16px; padding: 20px; margin-bottom: 25px; }
         .prompt-title { font-weight: bold; margin-bottom: 15px; font-size: 1.05rem; line-height: 1.4; color: #fbbf24; }
         
-        /* The "OR" Divider */
         .or-divider { text-align: center; color: #475569; font-size: 0.7rem; font-weight: bold; margin: 10px 0; text-transform: uppercase; letter-spacing: 1px; }
 
         .controls { display: flex; gap: 10px; margin-bottom: 5px; }
@@ -48,7 +46,7 @@
     <p class="sub-text">Honoring the voices that bridge the gap between panic and professional help.</p>
 
     <div class="section-label">1. Who is sending this?</div>
-    <div class="agency-picker">
+    <div class="agency-picker" id="picker">
         <button class="agency-btn" data-type="LEO">LAW ENFORCEMENT</button>
         <button class="agency-btn" data-type="FIRE">FIRE / RESCUE</button>
         <button class="agency-btn" data-type="EMS">EMS / MEDICAL</button>
@@ -59,22 +57,22 @@
         <div class="section-label">2. Your Message</div>
         
         <div class="prompt-card" id="card-1">
-            <div class="prompt-title" id="title-1">Prompt 1</div>
+            <div class="prompt-title" id="title-1">Loading...</div>
             <div class="controls">
-                <button class="rec-btn" id="btn-rec-1" onclick="startRec(1)">Record Voice</button>
-                <button class="stop-btn" id="btn-stop-1" onclick="stopRec(1)">Stop</button>
-                <button class="preview-btn" id="btn-prev-1" onclick="playPrev(1)">Preview</button>
+                <button class="rec-btn" onclick="startRec(1)" id="btn-rec-1">Record Voice</button>
+                <button class="stop-btn" onclick="stopRec(1)" id="btn-stop-1">Stop</button>
+                <button class="preview-btn" onclick="playPrev(1)" id="btn-prev-1">Preview</button>
             </div>
             <div class="or-divider">— OR —</div>
             <textarea class="prompt-textarea" id="text-1" rows="3" placeholder="Type your response here..."></textarea>
         </div>
 
         <div class="prompt-card" id="card-2">
-            <div class="prompt-title" id="title-2">Prompt 2</div>
+            <div class="prompt-title" id="title-2">Loading...</div>
             <div class="controls">
-                <button class="rec-btn" id="btn-rec-2" onclick="startRec(2)">Record Voice</button>
-                <button class="stop-btn" id="btn-stop-2" onclick="stopRec(2)">Stop</button>
-                <button class="preview-btn" id="btn-prev-2" onclick="playPrev(2)">Preview</button>
+                <button class="rec-btn" onclick="startRec(2)" id="btn-rec-2">Record Voice</button>
+                <button class="stop-btn" onclick="stopRec(2)" id="btn-stop-2">Stop</button>
+                <button class="preview-btn" onclick="playPrev(2)" id="btn-prev-2">Preview</button>
             </div>
             <div class="or-divider">— OR —</div>
             <textarea class="prompt-textarea" id="text-2" rows="3" placeholder="Type your response here..."></textarea>
@@ -83,9 +81,9 @@
         <div class="prompt-card" id="card-3">
             <div class="prompt-title">The "Open Mic" (Freestyle)</div>
             <div class="controls">
-                <button class="rec-btn" id="btn-rec-3" onclick="startRec(3)">Record Voice</button>
-                <button class="stop-btn" id="btn-stop-3" onclick="stopRec(3)">Stop</button>
-                <button class="preview-btn" id="btn-prev-3" onclick="playPrev(3)">Preview</button>
+                <button class="rec-btn" onclick="startRec(3)" id="btn-rec-3">Record Voice</button>
+                <button class="stop-btn" onclick="stopRec(3)" id="btn-stop-3">Stop</button>
+                <button class="preview-btn" onclick="playPrev(3)" id="btn-prev-3">Preview</button>
             </div>
             <div class="or-divider">— OR —</div>
             <textarea class="prompt-textarea" id="text-3" rows="3" placeholder="Type freestyle message here..."></textarea>
@@ -127,33 +125,36 @@
     let selectedAgency = "";
     const audioBlobs = {};
 
-    document.querySelectorAll('.agency-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            document.querySelectorAll('.agency-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            selectedAgency = btn.getAttribute('data-type');
+    // BUTTON FIX: Using a direct loop with click events
+    const buttons = document.querySelectorAll('.agency-btn');
+    buttons.forEach(btn => {
+        btn.addEventListener('click', function() {
+            buttons.forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            selectedAgency = this.getAttribute('data-type');
             
             document.getElementById('title-1').innerText = promptMap[selectedAgency][0];
             document.getElementById('title-2').innerText = promptMap[selectedAgency][1];
             
             document.getElementById('questions-section').style.display = 'block';
-            document.getElementById('status').innerText = "Ready.";
+            document.getElementById('status').innerText = "Ready to record.";
         });
     });
 
     window.startRec = async (id) => {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        mediaRecorder = new MediaRecorder(stream);
-        audioChunks = [];
-        mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
-        mediaRecorder.onstop = () => {
-            audioBlobs[id] = new Blob(audioChunks, { type: 'audio/webm' });
-            document.getElementById(`btn-prev-${id}`).style.display = 'block';
-            document.getElementById(`card-${id}`).classList.add('recorded');
-        };
-        mediaRecorder.start();
-        document.getElementById(`btn-rec-${id}`).style.display = 'none';
-        document.getElementById(`btn-stop-${id}`).style.display = 'block';
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            mediaRecorder = new MediaRecorder(stream);
+            audioChunks = [];
+            mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+            mediaRecorder.onstop = () => {
+                audioBlobs[id] = new Blob(audioChunks, { type: 'audio/webm' });
+                document.getElementById(`btn-prev-${id}`).style.display = 'block';
+            };
+            mediaRecorder.start();
+            document.getElementById(`btn-rec-${id}`).style.display = 'none';
+            document.getElementById(`btn-stop-${id}`).style.display = 'block';
+        } catch (e) { alert("Mic access denied."); }
     };
 
     window.stopRec = (id) => {
@@ -165,4 +166,42 @@
 
     window.playPrev = (id) => {
         if (audioBlobs[id]) {
-            const url =
+            const url = URL.createObjectURL(audioBlobs[id]);
+            new Audio(url).play();
+        }
+    };
+
+    window.finalSubmit = async () => {
+        const status = document.getElementById('status');
+        status.innerText = "Submitting...";
+        try {
+            for (let i = 1; i <= 3; i++) {
+                const note = document.getElementById(`text-${i}`).value.trim();
+                const audio = audioBlobs[i];
+                if (audio || note !== "") {
+                    let url = "";
+                    if (audio) {
+                        const fileRef = ref(storage, `audios/${Date.now()}_${i}.webm`);
+                        const snap = await uploadBytes(fileRef, audio);
+                        url = await getDownloadURL(snap.ref);
+                    }
+                    await addDoc(collection(db, "messages"), {
+                        agency: selectedAgency,
+                        prompt: i === 3 ? "Freestyle" : promptMap[selectedAgency][i-1],
+                        audioUrl: url,
+                        textNote: note,
+                        approved: false,
+                        timestamp: serverTimestamp()
+                    });
+                }
+            }
+            alert("Success!");
+            window.location.href = "index.html";
+        } catch (e) { 
+            alert("Error. Try again."); 
+            status.innerText = "Error.";
+        }
+    };
+</script>
+</body>
+</html>
