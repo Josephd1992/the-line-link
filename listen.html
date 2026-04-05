@@ -1,71 +1,94 @@
-<style>
-    .pending-card { border: 1px dashed #fbbf24 !important; opacity: 0.8; }
-    .admin-actions { display: flex; gap: 10px; margin-top: 10px; }
-    .btn-approve { background: #22c55e; color: white; padding: 5px 10px; border-radius: 5px; border: none; font-size: 0.7rem; cursor: pointer; }
-    .btn-delete { background: #ef4444; color: white; padding: 5px 10px; border-radius: 5px; border: none; font-size: 0.7rem; cursor: pointer; }
-</style>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Gold Line Link - Gallery</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #000; color: white; padding: 20px; display: flex; justify-content: center; margin: 0; }
+        .container { max-width: 500px; width: 100%; }
+        h1 { color: #fbbf24; text-align: center; }
+        .message-card { background: #111; border: 1px solid #334155; border-radius: 12px; padding: 15px; margin-bottom: 12px; }
+        .pending-card { border: 1px dashed #fbbf24; opacity: 0.8; }
+        .card-header { font-size: 0.7rem; color: #fbbf24; margin-bottom: 5px; }
+        .prompt-preview { font-weight: bold; font-size: 0.9rem; margin-bottom: 10px; }
+        .card-content { border-top: 1px solid #334155; padding-top: 10px; }
+        audio { width: 100%; margin-bottom: 10px; }
+        .admin-actions { margin-top: 10px; display: flex; gap: 10px; }
+        .btn-adm { padding: 5px 10px; border: none; border-radius: 5px; cursor: pointer; font-size: 0.7rem; font-weight: bold; }
+        .btn-app { background: #22c55e; color: white; }
+        .btn-del { background: #ef4444; color: white; }
+        .nav-link { display: block; text-align: center; margin-top: 30px; color: #64748b; text-decoration: none; font-size: 0.8rem; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Appreciation Gallery</h1>
+    <div id="status">Loading messages...</div>
+    <div id="messageList"></div>
+    <a href="index.html" class="nav-link">← BACK TO HOME</a>
+</div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getFirestore, collection, getDocs, query, orderBy, doc, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-    // ... Firebase Config ...
-    const SUPERVISOR_KEY = "1033"; 
+    const firebaseConfig = {
+        apiKey: "AIzaSyC4-eypucZ9FjS4sk4CQgkeNMPyyh4HvcU",
+        authDomain: "the-line-link.firebaseapp.com",
+        projectId: "the-line-link",
+        storageBucket: "the-line-link.firebasestorage.app",
+        messagingSenderId: "378236622341",
+        appId: "1:378236622341:web:6809e3cd491a7e945b2e6c",
+        measurementId: "G-KHPWDYHQRF"
+    };
 
-    // Check if we are in admin mode via the secret URL link
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const SUPERVISOR_KEY = "1033"; 
     const isAdmin = new URLSearchParams(window.location.search).get('admin') === 'true';
 
     async function loadGallery() {
         const q = query(collection(db, "messages"), orderBy("timestamp", "desc"));
-        const querySnapshot = await getDocs(q);
-        const all = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-
+        const snap = await getDocs(q);
         const list = document.getElementById('messageList');
+        document.getElementById('status').style.display = 'none';
         list.innerHTML = '';
 
-        all.forEach(msg => {
-            // Logic: If not admin, only show approved. If admin, show all.
-            if (!isAdmin && !msg.approved) return;
+        snap.forEach(d => {
+            const m = d.data();
+            const id = d.id;
+            if (!isAdmin && !m.approved) return;
 
             const card = document.createElement('div');
-            card.className = `message-card ${!msg.approved ? 'pending-card' : ''}`;
+            card.className = `message-card ${!m.approved ? 'pending-card' : ''}`;
             card.innerHTML = `
-                <div class="card-header">
-                    <span>${msg.agency} ${!msg.approved ? '(PENDING)' : ''}</span>
-                </div>
-                <div class="prompt-preview">${msg.prompt}</div>
-                <div class="card-content" style="display:none;">
-                    ${msg.audioUrl ? `<audio controls src="${msg.audioUrl}"></audio>` : ''}
-                    <p>${msg.textNote}</p>
+                <div class="card-header">${m.agency} ${!m.approved ? '(PENDING REVIEW)' : ''}</div>
+                <div class="prompt-preview">${m.prompt}</div>
+                <div class="card-content">
+                    ${m.audioUrl ? `<audio controls src="${m.audioUrl}"></audio>` : ''}
+                    ${m.textNote ? `<p>${m.textNote}</p>` : ''}
                     ${isAdmin ? `
                         <div class="admin-actions">
-                            <button class="btn-approve" onclick="manage('${msg.id}', 'approve')">APPROVE</button>
-                            <button class="btn-delete" onclick="manage('${msg.id}', 'delete')">DELETE</button>
+                            <button class="btn-adm btn-app" onclick="manage('${id}', 'app')">APPROVE</button>
+                            <button class="btn-adm btn-del" onclick="manage('${id}', 'del')">DELETE</button>
                         </div>
                     ` : ''}
                 </div>
             `;
-            card.onclick = (e) => {
-                if(e.target.tagName !== 'BUTTON' && e.target.tagName !== 'AUDIO') {
-                    const c = card.querySelector('.card-content');
-                    c.style.display = c.style.display === 'none' ? 'block' : 'none';
-                }
-            };
             list.appendChild(card);
         });
     }
 
-    window.manage = async (id, action) => {
-        const pin = prompt("Enter Supervisor PIN:");
+    window.manage = async (id, act) => {
+        const pin = prompt("Supervisor PIN:");
         if (pin !== SUPERVISOR_KEY) return alert("Wrong PIN");
-
-        if (action === 'approve') {
-            await updateDoc(doc(db, "messages", id), { approved: true });
-        } else {
-            await deleteDoc(doc(db, "messages", id));
-        }
+        if (act === 'app') await updateDoc(doc(db, "messages", id), { approved: true });
+        else await deleteDoc(doc(db, "messages", id));
         location.reload();
     };
 
     loadGallery();
 </script>
+</body>
+</html>
