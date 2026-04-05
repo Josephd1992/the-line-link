@@ -5,32 +5,38 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>The Gold Line Link</title>
     <style>
-        /* Base Page Setup */
+        /* Base Page Styling */
         body { font-family: 'Segoe UI', sans-serif; background: #000; color: white; margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; text-align: center; }
         .container { max-width: 400px; padding: 20px; width: 100%; box-sizing: border-box; }
         
+        /* Branding Elements */
         .gold-divider { height: 2px; width: 60px; background: #fbbf24; margin: 20px auto; }
         h1 { color: #fbbf24; margin-bottom: 10px; font-size: 2.2rem; letter-spacing: 1px; }
-        p { color: #94a3b8; margin-bottom: 30px; line-height: 1.5; font-size: 0.95rem; }
+        .tagline { color: #94a3b8; margin-bottom: 30px; line-height: 1.5; font-size: 0.95rem; font-style: italic; }
         
-        /* Buttons */
+        /* Main Navigation Buttons */
         .btn { display: block; width: 100%; padding: 18px; margin-bottom: 15px; border-radius: 12px; text-decoration: none; font-weight: bold; font-size: 1.1rem; transition: 0.3s; box-sizing: border-box; cursor: pointer; border: none; }
         .btn-gold { background: #fbbf24; color: #000; }
+        .btn-gold:hover { background: #d97706; transform: translateY(-2px); }
+        
         .btn-outline { border: 1px solid #fbbf24; color: #fbbf24; background: transparent; }
+        .btn-outline:hover { background: rgba(251, 191, 36, 0.1); }
+        
         .btn-info { border: 1px solid #334155; color: #64748b; font-size: 0.85rem; margin-top: 10px; background: transparent; }
 
-        /* Modal Styles - Set to 'none' by default */
+        /* How-To Modal Styles */
         #howToModal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); backdrop-filter: blur(5px); align-items: center; justify-content: center; }
         
-        .modal-content { background: #111; border: 1px solid #fbbf24; padding: 25px; border-radius: 20px; max-width: 85%; text-align: left; box-shadow: 0 0 30px rgba(251, 191, 36, 0.2); }
-        .modal-content h2 { color: #fbbf24; margin-top: 0; font-size: 1.2rem; border-bottom: 1px solid #334155; padding-bottom: 10px; }
-        .modal-content h3 { color: #fbbf24; font-size: 1rem; margin-bottom: 5px; margin-top: 15px; }
-        .modal-content ul { padding-left: 18px; color: #e2e8f0; line-height: 1.5; font-size: 0.85rem; }
-        .modal-content li { margin-bottom: 8px; }
+        .modal-content { background: #111; border: 1px solid #fbbf24; padding: 25px; border-radius: 20px; max-width: 85%; text-align: left; box-shadow: 0 0 30px rgba(251, 191, 36, 0.3); overflow-y: auto; max-height: 90vh; }
+        .modal-content h2 { color: #fbbf24; margin-top: 0; font-size: 1.3rem; border-bottom: 1px solid #334155; padding-bottom: 10px; }
+        .modal-content h3 { color: #fbbf24; font-size: 1rem; margin-bottom: 5px; margin-top: 15px; text-transform: uppercase; letter-spacing: 1px; }
+        .modal-content ul { padding-left: 20px; color: #e2e8f0; line-height: 1.6; font-size: 0.9rem; margin-top: 5px; }
+        .modal-content li { margin-bottom: 10px; }
         
-        .close-modal { display: block; text-align: center; margin-top: 25px; background: #fbbf24; color: #000; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; text-transform: uppercase; }
+        .close-modal { display: block; text-align: center; margin-top: 25px; background: #fbbf24; color: #000; padding: 14px; border-radius: 10px; font-weight: bold; cursor: pointer; text-transform: uppercase; }
         
-        .secret-admin { margin-top: 40px; color: #1a1a1a; font-size: 0.7rem; }
+        /* Secret Supervisor Link */
+        .secret-admin { margin-top: 40px; color: #1a1a1a; font-size: 0.7rem; cursor: default; user-select: none; }
     </style>
 </head>
 <body>
@@ -38,7 +44,7 @@
 <div class="container">
     <h1>The Gold Line Link</h1>
     <div class="gold-divider"></div>
-    <p>Connecting the community to the dispatchers who have our backs. Send a message of appreciation for Telecommunicator Week.</p>
+    <p class="tagline">Honoring the voices that bridge the gap between chaos and help.</p>
 
     <a href="record.html" class="btn btn-gold">RECORD A MESSAGE</a>
     <a href="listen.html" class="btn btn-outline">LISTEN TO THE LINK</a>
@@ -49,19 +55,27 @@
 
 <div id="howToModal">
     <div class="modal-content">
-        <h2>Guidance & Privacy</h2>
+        <h2>How The Link Works</h2>
         
-        <h3>How to Participate</h3>
+        <h3>1. Recording</h3>
         <ul>
-            <li><strong>Identify:</strong> Choose your agency or select "Community Member."</li>
-            <li><strong>Share:</strong> Record a voice message or type a note.</li>
-            <li><strong>Review:</strong> Every message is screened by a <strong>PVRCC Supervisor</strong> before going live.</li>
+            <li>Tap <strong>Record a Message</strong> and select your agency or "Community Member."</li>
+            <li>Specific prompts will appear. You can record a voice clip <strong>OR</strong> type a message for <strong>one, two, or all three</strong> cards.</li>
+            <li>Hit <strong>Submit</strong> at the bottom when you are finished.</li>
+            <li>Your message is sent to a private queue for supervisor review.</li>
         </ul>
 
-        <h3>Privacy & Safety</h3>
+        <h3>2. The Gallery</h3>
         <ul>
-            <li><strong>No Personal Data:</strong> Do not include case numbers or sensitive HIPAA data.</li>
-            <li><strong>Storage:</strong> Files are stored on a secure server for staff appreciation.</li>
+            <li>Tap <strong>Listen to the Link</strong> to see the shared messages of appreciation.</li>
+            <li><strong>Tap any card</strong> in the gallery to expand it and play the audio or read the note.</li>
+            <li>Use the <strong>Filters</strong> or <strong>Random</strong> button to find specific messages.</li>
+        </ul>
+
+        <h3>3. Privacy & Safety</h3>
+        <ul>
+            <li>Messages are reviewed by <strong>PVRCC Supervisors</strong> before going live to ensure a positive environment.</li>
+            <li><strong>Security:</strong> Please do not include active case numbers or sensitive HIPAA data.</li>
         </ul>
 
         <span class="close-modal" onclick="toggleModal()">Accept & Continue</span>
@@ -69,9 +83,9 @@
 </div>
 
 <script>
+    // Function to show/hide the instructions modal
     function toggleModal() {
         var modal = document.getElementById('howToModal');
-        // Simple toggle logic
         if (modal.style.display === 'flex') {
             modal.style.display = 'none';
         } else {
@@ -79,7 +93,7 @@
         }
     }
 
-    // Close modal if user clicks the dark background
+    // Close the modal if the user clicks anywhere outside the content box
     window.onclick = function(event) {
         var modal = document.getElementById('howToModal');
         if (event.target == modal) {
