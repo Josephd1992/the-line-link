@@ -1,183 +1,71 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Gold Line Link - Gallery</title>
-    <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #000000; color: white; padding: 20px; margin: 0; display: flex; justify-content: center; }
-        .container { max-width: 500px; width: 100%; padding-bottom: 50px; }
-        h1 { color: #fbbf24; text-align: center; margin-bottom: 5px; }
-        
-        .controls-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 25px; justify-content: center; }
-        .filter-btn { padding: 8px 15px; border-radius: 20px; border: 1px solid #334155; background: #111111; color: #94a3b8; cursor: pointer; font-size: 0.8rem; font-weight: bold; transition: 0.3s; }
-        .filter-btn.active { background: #fbbf24; color: #000; border-color: #fbbf24; }
-        
-        .random-btn { padding: 8px 15px; border-radius: 20px; border: 1px solid #fbbf24; background: transparent; color: #fbbf24; cursor: pointer; font-size: 0.8rem; font-weight: bold; }
-
-        #messageList { display: flex; flex-direction: column; gap: 12px; }
-        .message-card { background: #111111; border: 1px solid #334155; border-radius: 12px; padding: 15px; position: relative; overflow: hidden; cursor: pointer; transition: 0.2s; }
-        
-        .agency-stripe { position: absolute; top: 0; left: 0; width: 4px; height: 100%; }
-        .stripe-LEO { background: #3b82f6; }
-        .stripe-FIRE { background: #ef4444; }
-        .stripe-EMS { background: #ffffff; }
-
-        .card-header { display: flex; justify-content: space-between; align-items: center; pointer-events: none; }
-        .agency-label { font-size: 0.7rem; font-weight: bold; letter-spacing: 1px; }
-        .LEO-text { color: #3b82f6; }
-        .FIRE-text { color: #ef4444; }
-        .EMS-text { color: #ffffff; }
-
-        .prompt-preview { color: #fbbf24; font-size: 0.9rem; margin-top: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 80%; }
-        .timestamp { color: #475569; font-size: 0.7rem; }
-
-        /* Hidden Content */
-        .card-content { display: none; margin-top: 15px; border-top: 1px solid #334155; padding-top: 15px; }
-        .audio-player { width: 100%; margin-top: 5px; }
-        .text-note { background: #1a1a1a; padding: 12px; border-radius: 8px; font-size: 0.95rem; line-height: 1.5; color: #e2e8f0; border: 1px solid #334155; }
-
-        /* Secret Delete Button */
-        .delete-trigger { margin-top: 15px; color: #475569; font-size: 0.6rem; text-align: right; text-transform: uppercase; cursor: pointer; }
-        .delete-trigger:hover { color: #ef4444; }
-
-        #status { text-align: center; margin-top: 20px; color: #fbbf24; }
-        .nav-link { display: block; text-align: center; margin-top: 30px; color: #64748b; text-decoration: none; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; }
-    </style>
-</head>
-<body>
-
-<div class="container">
-    <h1>Appreciation Gallery</h1>
-    
-    <div class="controls-row">
-        <button class="filter-btn active" onclick="filterGallery('ALL', this)">ALL</button>
-        <button class="filter-btn" onclick="filterGallery('LEO', this)">LAW</button>
-        <button class="filter-btn" onclick="filterGallery('FIRE', this)">FIRE</button>
-        <button class="filter-btn" onclick="filterGallery('EMS', this)">EMS</button>
-        <button class="random-btn" onclick="playRandom()">🎲 RANDOM</button>
-    </div>
-    
-    <div id="status">Loading...</div>
-    <div id="messageList"></div>
-
-    <a href="index.html" class="nav-link">← Back to Home</a>
-</div>
+<style>
+    .pending-card { border: 1px dashed #fbbf24 !important; opacity: 0.8; }
+    .admin-actions { display: flex; gap: 10px; margin-top: 10px; }
+    .btn-approve { background: #22c55e; color: white; padding: 5px 10px; border-radius: 5px; border: none; font-size: 0.7rem; cursor: pointer; }
+    .btn-delete { background: #ef4444; color: white; padding: 5px 10px; border-radius: 5px; border: none; font-size: 0.7rem; cursor: pointer; }
+</style>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, collection, getDocs, query, orderBy, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, collection, getDocs, query, orderBy, doc, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-    const firebaseConfig = {
-        apiKey: "AIzaSyC4-eypucZ9FjS4sk4CQgkeNMPyyh4HvcU",
-        authDomain: "the-line-link.firebaseapp.com",
-        projectId: "the-line-link",
-        storageBucket: "the-line-link.firebasestorage.app",
-        messagingSenderId: "378236622341",
-        appId: "1:378236622341:web:6809e3cd491a7e945b2e6c",
-        measurementId: "G-KHPWDYHQRF"
-    };
+    // ... Firebase Config ...
+    const SUPERVISOR_KEY = "1033"; 
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-
-    let allMessages = [];
-    const SUPERVISOR_KEY = "1033"; // CHANGE THIS TO YOUR SECRET PIN
+    // Check if we are in admin mode via the secret URL link
+    const isAdmin = new URLSearchParams(window.location.search).get('admin') === 'true';
 
     async function loadGallery() {
-        const messageList = document.getElementById('messageList');
-        const status = document.getElementById('status');
+        const q = query(collection(db, "messages"), orderBy("timestamp", "desc"));
+        const querySnapshot = await getDocs(q);
+        const all = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-        try {
-            const q = query(collection(db, "messages"), orderBy("timestamp", "desc"));
-            const querySnapshot = await getDocs(q);
-            allMessages = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            
-            status.style.display = 'none';
-            renderMessages(allMessages);
-        } catch (e) {
-            console.error(e);
-            status.innerText = "Error loading gallery.";
-        }
-    }
+        const list = document.getElementById('messageList');
+        list.innerHTML = '';
 
-    function renderMessages(data) {
-        const messageList = document.getElementById('messageList');
-        messageList.innerHTML = '';
+        all.forEach(msg => {
+            // Logic: If not admin, only show approved. If admin, show all.
+            if (!isAdmin && !msg.approved) return;
 
-        data.forEach((msg) => {
-            const timeStr = msg.timestamp ? msg.timestamp.toDate().toLocaleString([], {month: 'short', day: 'numeric', hour: '2-digit', minute:'2-digit'}) : "Just now";
             const card = document.createElement('div');
-            card.className = `message-card agency-${msg.agency}`;
-            card.onclick = (e) => toggleCard(e, card);
-            
+            card.className = `message-card ${!msg.approved ? 'pending-card' : ''}`;
             card.innerHTML = `
-                <div class="agency-stripe stripe-${msg.agency}"></div>
                 <div class="card-header">
-                    <span class="agency-label ${msg.agency}-text">${msg.agency}</span>
-                    <span class="timestamp">${timeStr}</span>
+                    <span>${msg.agency} ${!msg.approved ? '(PENDING)' : ''}</span>
                 </div>
                 <div class="prompt-preview">${msg.prompt}</div>
-                <div class="card-content">
-                    ${msg.audioUrl ? `<audio controls class="audio-player" src="${msg.audioUrl}"></audio>` : ''}
-                    ${msg.textNote ? `<div class="text-note">${msg.textNote}</div>` : ''}
-                    <div class="delete-trigger" onclick="adminDelete('${msg.id}')">Admin Only</div>
+                <div class="card-content" style="display:none;">
+                    ${msg.audioUrl ? `<audio controls src="${msg.audioUrl}"></audio>` : ''}
+                    <p>${msg.textNote}</p>
+                    ${isAdmin ? `
+                        <div class="admin-actions">
+                            <button class="btn-approve" onclick="manage('${msg.id}', 'approve')">APPROVE</button>
+                            <button class="btn-delete" onclick="manage('${msg.id}', 'delete')">DELETE</button>
+                        </div>
+                    ` : ''}
                 </div>
             `;
-            messageList.appendChild(card);
+            card.onclick = (e) => {
+                if(e.target.tagName !== 'BUTTON' && e.target.tagName !== 'AUDIO') {
+                    const c = card.querySelector('.card-content');
+                    c.style.display = c.style.display === 'none' ? 'block' : 'none';
+                }
+            };
+            list.appendChild(card);
         });
     }
 
-    window.toggleCard = (e, card) => {
-        if (e.target.tagName === 'AUDIO' || e.target.className === 'delete-trigger') return;
-        const content = card.querySelector('.card-content');
-        const isOpen = content.style.display === 'block';
-        content.style.display = isOpen ? 'none' : 'block';
-    };
+    window.manage = async (id, action) => {
+        const pin = prompt("Enter Supervisor PIN:");
+        if (pin !== SUPERVISOR_KEY) return alert("Wrong PIN");
 
-    // THE SECRET DELETE FUNCTION
-    window.adminDelete = async (id) => {
-        const pin = prompt("Enter Supervisor PIN to delete this entry:");
-        if (pin === SUPERVISOR_KEY) {
-            if (confirm("Are you sure you want to remove this from the gallery?")) {
-                try {
-                    await deleteDoc(doc(db, "messages", id));
-                    alert("Entry deleted.");
-                    loadGallery(); // Refresh the list
-                } catch (e) {
-                    alert("Error deleting entry.");
-                }
-            }
-        } else if (pin !== null) {
-            alert("Unauthorized Access.");
+        if (action === 'approve') {
+            await updateDoc(doc(db, "messages", id), { approved: true });
+        } else {
+            await deleteDoc(doc(db, "messages", id));
         }
-    };
-
-    window.filterGallery = (agency, btn) => {
-        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        const filtered = agency === 'ALL' ? allMessages : allMessages.filter(m => m.agency === agency);
-        renderMessages(filtered);
-    };
-
-    window.playRandom = () => {
-        if (allMessages.length === 0) return;
-        const randomMsg = allMessages[Math.floor(Math.random() * allMessages.length)];
-        filterGallery('ALL', document.querySelector('[onclick*="ALL"]'));
-        setTimeout(() => {
-            const cards = document.querySelectorAll('.message-card');
-            cards.forEach(c => {
-                if(c.querySelector('.prompt-preview').innerText === randomMsg.prompt) {
-                    c.click();
-                    c.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    c.style.borderColor = '#fbbf24';
-                    setTimeout(() => c.style.borderColor = '#334155', 2000);
-                }
-            });
-        }, 100);
+        location.reload();
     };
 
     loadGallery();
 </script>
-</body>
-</html>
