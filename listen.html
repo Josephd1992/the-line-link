@@ -5,34 +5,35 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>The Gold Line Link - Gallery</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #000; color: white; padding: 10px; display: flex; justify-content: center; margin: 0; }
-        .container { max-width: 500px; width: 100%; padding-bottom: 40px; }
-        h1 { color: #fbbf24; text-align: center; font-size: 1.8rem; margin-top: 20px; }
+        body { font-family: 'Segoe UI', sans-serif; background: #000; color: white; padding: 15px; display: flex; justify-content: center; margin: 0; }
+        .container { max-width: 500px; width: 100%; padding-bottom: 50px; }
+        h1 { color: #fbbf24; text-align: center; font-size: 1.8rem; margin-top: 10px; margin-bottom: 25px; }
         
-        /* Filter Bar Styles */
-        .filter-bar { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 20px; }
-        .filter-btn { padding: 10px 5px; border: 1px solid #334155; border-radius: 8px; background: #111; color: #94a3b8; cursor: pointer; font-size: 0.65rem; font-weight: bold; transition: 0.3s; }
+        /* 5-Button Filter Grid */
+        .filter-bar { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 15px; }
+        .filter-btn { padding: 12px 5px; border: 1px solid #334155; border-radius: 8px; background: #111; color: #94a3b8; cursor: pointer; font-size: 0.65rem; font-weight: bold; transition: 0.3s; text-transform: uppercase; }
         .filter-btn.active { border-color: #fbbf24; color: #fbbf24; background: rgba(251, 191, 36, 0.1); }
-        .btn-random { grid-column: span 3; background: #fbbf24; color: #000; border: none; font-size: 0.8rem; margin-top: 5px; }
+        
+        /* Random Button spans the whole width below the 4 filters */
+        .btn-random { grid-column: span 4; background: #fbbf24; color: #000; border: none; font-size: 0.85rem; margin-top: 5px; padding: 15px; }
 
-        .message-card { background: #111; border: 1px solid #334155; border-radius: 12px; padding: 15px; margin-bottom: 12px; position: relative; overflow: hidden; transition: 0.2s; cursor: pointer; }
+        .message-card { background: #111; border: 1px solid #334155; border-radius: 12px; padding: 15px; margin-bottom: 15px; position: relative; overflow: hidden; transition: 0.2s; cursor: pointer; }
         .stripe { position: absolute; left: 0; top: 0; bottom: 0; width: 5px; }
         .stripe-LEO { background: #3b82f6; }
         .stripe-FIRE { background: #ef4444; }
         .stripe-EMS { background: #ffffff; }
         .stripe-CITIZEN { background: #fbbf24; }
 
-        .card-header { font-size: 0.7rem; font-weight: bold; margin-bottom: 8px; }
-        .prompt-preview { font-weight: bold; font-size: 0.95rem; color: #e2e8f0; margin-bottom: 5px; }
+        .card-header { font-size: 0.7rem; font-weight: bold; margin-bottom: 8px; display: flex; justify-content: space-between; }
+        .prompt-preview { font-weight: bold; font-size: 0.95rem; color: #e2e8f0; margin-bottom: 5px; line-height: 1.4; }
         
-        /* Hidden by default until tapped */
+        /* Content hidden until card is tapped */
         .card-content { display: none; border-top: 1px solid #1e293b; padding-top: 12px; margin-top: 10px; }
         audio { width: 100%; margin-bottom: 10px; height: 35px; }
-        .text-note { font-size: 0.9rem; color: #cbd5e1; font-style: italic; }
+        .text-note { font-size: 0.95rem; color: #cbd5e1; font-style: italic; line-height: 1.5; white-space: pre-wrap; }
 
-        .btn-adm { padding: 8px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.75rem; width: 100%; margin-top: 10px; }
-        .btn-app { background: #22c55e; color: white; }
-        .nav-link { display: block; text-align: center; margin-top: 30px; color: #fbbf24; text-decoration: none; font-size: 0.9rem; }
+        .btn-adm { padding: 12px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 0.8rem; width: 100%; margin-top: 15px; background: #22c55e; color: white; }
+        .nav-link { display: block; text-align: center; margin-top: 40px; color: #fbbf24; text-decoration: none; font-size: 0.9rem; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -43,7 +44,9 @@
     <div class="filter-bar">
         <button class="filter-btn active" onclick="filter('ALL', this)">ALL</button>
         <button class="filter-btn" onclick="filter('LEO', this)">LAW</button>
-        <button class="filter-btn" onclick="filter('FIRE', this)">FIRE/EMS</button>
+        <button class="filter-btn" onclick="filter('FIRE', this)">FIRE</button>
+        <button class="filter-btn" onclick="filter('EMS', this)">EMS</button>
+        <button class="filter-btn" onclick="filter('CITIZEN', this)">COMMUNITY</button>
         <button class="filter-btn btn-random" onclick="pickRandom()">🎲 RANDOM SHUFFLE</button>
     </div>
 
@@ -53,7 +56,7 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, collection, getDocs, query, orderBy, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, collection, getDocs, query, orderBy, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyC4-eypucZ9FjS4sk4CQgkeNMPyyh4HvcU",
@@ -80,6 +83,9 @@
     function render(data) {
         const list = document.getElementById('messageList');
         list.innerHTML = '';
+        
+        const agencyNames = { 'LEO': 'Law Enforcement', 'FIRE': 'Fire / Rescue', 'EMS': 'EMS / Medical', 'CITIZEN': 'Community Member' };
+
         data.forEach(m => {
             if (!isAdmin && !m.approved) return;
             
@@ -87,14 +93,18 @@
             card.className = 'message-card';
             card.innerHTML = `
                 <div class="stripe stripe-${m.agency}"></div>
-                <div class="card-header">${m.agency} ${!m.approved ? '🔒 PENDING' : ''}</div>
+                <div class="card-header">
+                    <span>${agencyNames[m.agency] || m.agency}</span>
+                    <span>${!m.approved ? '🔒 PENDING' : ''}</span>
+                </div>
                 <div class="prompt-preview">${m.prompt}</div>
                 <div class="card-content" id="c-${m.id}">
                     ${m.audioUrl ? `<audio controls src="${m.audioUrl}"></audio>` : ''}
                     ${m.textNote ? `<div class="text-note">"${m.textNote}"</div>` : ''}
-                    ${isAdmin ? `<button class="btn-adm btn-app" onclick="approve('${m.id}')">APPROVE</button>` : ''}
+                    ${isAdmin && !m.approved ? `<button class="btn-adm" onclick="approve('${m.id}')">APPROVE MESSAGE</button>` : ''}
                 </div>
             `;
+            
             card.onclick = (e) => {
                 if(e.target.tagName !== 'AUDIO' && e.target.tagName !== 'BUTTON') {
                     const content = card.querySelector('.card-content');
@@ -109,23 +119,28 @@
         document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         if (type === 'ALL') render(allMessages);
-        else render(allMessages.filter(m => m.agency === type || (type === 'FIRE' && (m.agency === 'FIRE' || m.agency === 'EMS'))));
+        else render(allMessages.filter(m => m.agency === type));
     };
 
     window.pickRandom = () => {
         const approved = allMessages.filter(m => m.approved);
-        if (approved.length === 0) return;
+        if (approved.length === 0) return alert("No approved messages yet!");
         const random = approved[Math.floor(Math.random() * approved.length)];
         render([random]);
-        const content = document.getElementById(`c-${random.id}`);
-        if(content) content.style.display = 'block';
+        // Auto-expand the random one
+        setTimeout(() => {
+            const content = document.getElementById(`c-${random.id}`);
+            if(content) content.style.display = 'block';
+        }, 100);
     };
 
     window.approve = async (id) => {
-        const pin = prompt("Enter PIN:");
+        const pin = prompt("Supervisor PIN:");
         if (pin === "1033") {
             await updateDoc(doc(db, "messages", id), { approved: true });
             location.reload();
+        } else {
+            alert("Incorrect PIN");
         }
     };
 
