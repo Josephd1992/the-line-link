@@ -9,11 +9,10 @@
         .container { max-width: 500px; width: 100%; padding-bottom: 50px; }
         h1 { color: #fbbf24; text-align: center; margin-bottom: 10px; }
         .sub-text { text-align: center; color: #94a3b8; margin-bottom: 30px; font-size: 0.95rem; font-style: italic; line-height: 1.4; }
-        
         .section-label { font-size: 0.8rem; text-transform: uppercase; color: #fbbf24; letter-spacing: 1px; margin: 20px 0 10px; font-weight: bold; }
         
         .agency-picker { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
-        .agency-btn { padding: 15px; border: 1px solid #334155; border-radius: 10px; background: #111; color: #94a3b8; cursor: pointer; font-weight: bold; font-size: 0.75rem; transition: 0.3s; outline: none; }
+        .agency-btn { padding: 15px; border: 1px solid #334155; border-radius: 10px; background: #111; color: #94a3b8; cursor: pointer; font-weight: bold; font-size: 0.75rem; transition: 0.3s; }
         
         /* Active Colors */
         .agency-btn.active[data-type="LEO"] { border-color: #3b82f6; color: #3b82f6; background: rgba(59, 130, 246, 0.1); }
@@ -22,79 +21,99 @@
         .agency-btn.active[data-type="CITIZEN"] { border-color: #fbbf24; color: #fbbf24; background: rgba(251, 191, 36, 0.1); }
 
         .prompt-card { background: #111; border: 1px solid #334155; border-radius: 16px; padding: 20px; margin-bottom: 25px; }
-        .prompt-title { font-weight: bold; margin-bottom: 15px; font-size: 1.05rem; line-height: 1.4; color: #fbbf24; }
-        
-        .or-divider { text-align: center; color: #475569; font-size: 0.7rem; font-weight: bold; margin: 10px 0; text-transform: uppercase; letter-spacing: 1px; }
-
+        .prompt-title { font-weight: bold; margin-bottom: 15px; font-size: 1.05rem; color: #fbbf24; }
+        .or-divider { text-align: center; color: #475569; font-size: 0.7rem; font-weight: bold; margin: 10px 0; text-transform: uppercase; }
         .controls { display: flex; gap: 10px; margin-bottom: 5px; }
         .rec-btn { flex: 2; padding: 12px; border-radius: 8px; border: none; font-weight: bold; background: #fbbf24; color: #000; cursor: pointer; }
         .stop-btn { flex: 1; padding: 12px; border-radius: 8px; border: none; font-weight: bold; background: #ef4444; color: white; display: none; cursor: pointer; }
         .preview-btn { flex: 1; padding: 12px; border-radius: 8px; border: none; font-weight: bold; background: #475569; color: white; display: none; cursor: pointer; }
-
         .prompt-textarea { width: 100%; background: #000; border: 1px solid #334155; border-radius: 8px; padding: 12px; color: white; font-family: inherit; resize: none; box-sizing: border-box; }
         .submit-btn { width: 100%; padding: 20px; border-radius: 12px; border: none; background: #fbbf24; color: #000; font-size: 1.2rem; font-weight: bold; cursor: pointer; margin-top: 10px; }
         #status { text-align: center; margin-top: 15px; color: #fbbf24; font-weight: bold; }
-        .back-nav { margin-bottom: 20px; text-align: center; }
-        .back-btn { color: #fbbf24; text-decoration: none; border: 1px solid #fbbf24; padding: 5px 15px; border-radius: 20px; font-size: 0.8rem; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div class="back-nav"><a href="index.html" class="back-btn">← BACK</a></div>
     <h1>The Gold Line Link</h1>
     <p class="sub-text">Honoring the voices that bridge the gap between panic and professional help.</p>
 
     <div class="section-label">1. Who is sending this?</div>
-    <div class="agency-picker" id="picker">
-        <button class="agency-btn" data-type="LEO">LAW ENFORCEMENT</button>
-        <button class="agency-btn" data-type="FIRE">FIRE / RESCUE</button>
-        <button class="agency-btn" data-type="EMS">EMS / MEDICAL</button>
-        <button class="agency-btn" data-type="CITIZEN">COMMUNITY MEMBER</button>
+    <div class="agency-picker">
+        <button class="agency-btn" data-type="LEO" onclick="setAgency('LEO', this)">LAW ENFORCEMENT</button>
+        <button class="agency-btn" data-type="FIRE" onclick="setAgency('FIRE', this)">FIRE / RESCUE</button>
+        <button class="agency-btn" data-type="EMS" onclick="setAgency('EMS', this)">EMS / MEDICAL</button>
+        <button class="agency-btn" data-type="CITIZEN" onclick="setAgency('CITIZEN', this)">COMMUNITY MEMBER</button>
     </div>
 
     <div id="questions-section" style="display:none;">
         <div class="section-label">2. Your Message</div>
-        
-        <div class="prompt-card" id="card-1">
-            <div class="prompt-title" id="title-1">Loading...</div>
+        <div class="prompt-card">
+            <div class="prompt-title" id="title-1">Prompt 1</div>
             <div class="controls">
-                <button class="rec-btn" onclick="startRec(1)" id="btn-rec-1">Record Voice</button>
-                <button class="stop-btn" onclick="stopRec(1)" id="btn-stop-1">Stop</button>
-                <button class="preview-btn" onclick="playPrev(1)" id="btn-prev-1">Preview</button>
+                <button class="rec-btn" id="btn-rec-1" onclick="startRec(1)">Record Voice</button>
+                <button class="stop-btn" id="btn-stop-1" onclick="stopRec(1)">Stop</button>
+                <button class="preview-btn" id="btn-prev-1" onclick="playPrev(1)">Preview</button>
             </div>
             <div class="or-divider">— OR —</div>
-            <textarea class="prompt-textarea" id="text-1" rows="3" placeholder="Type your response here..."></textarea>
+            <textarea class="prompt-textarea" id="text-1" rows="3" placeholder="Type here..."></textarea>
         </div>
 
-        <div class="prompt-card" id="card-2">
-            <div class="prompt-title" id="title-2">Loading...</div>
+        <div class="prompt-card">
+            <div class="prompt-title" id="title-2">Prompt 2</div>
             <div class="controls">
-                <button class="rec-btn" onclick="startRec(2)" id="btn-rec-2">Record Voice</button>
-                <button class="stop-btn" onclick="stopRec(2)" id="btn-stop-2">Stop</button>
-                <button class="preview-btn" onclick="playPrev(2)" id="btn-prev-2">Preview</button>
+                <button class="rec-btn" id="btn-rec-2" onclick="startRec(2)">Record Voice</button>
+                <button class="stop-btn" id="btn-stop-2" onclick="stopRec(2)">Stop</button>
+                <button class="preview-btn" id="btn-prev-2" onclick="playPrev(2)">Preview</button>
             </div>
             <div class="or-divider">— OR —</div>
-            <textarea class="prompt-textarea" id="text-2" rows="3" placeholder="Type your response here..."></textarea>
+            <textarea class="prompt-textarea" id="text-2" rows="3" placeholder="Type here..."></textarea>
         </div>
 
-        <div class="prompt-card" id="card-3">
+        <div class="prompt-card">
             <div class="prompt-title">The "Open Mic" (Freestyle)</div>
             <div class="controls">
-                <button class="rec-btn" onclick="startRec(3)" id="btn-rec-3">Record Voice</button>
-                <button class="stop-btn" onclick="stopRec(3)" id="btn-stop-3">Stop</button>
-                <button class="preview-btn" onclick="playPrev(3)" id="btn-prev-3">Preview</button>
+                <button class="rec-btn" id="btn-rec-3" onclick="startRec(3)">Record Voice</button>
+                <button class="stop-btn" id="btn-stop-3" onclick="stopRec(3)">Stop</button>
+                <button class="preview-btn" id="btn-prev-3" onclick="playPrev(3)">Preview</button>
             </div>
             <div class="or-divider">— OR —</div>
-            <textarea class="prompt-textarea" id="text-3" rows="3" placeholder="Type freestyle message here..."></textarea>
+            <textarea class="prompt-textarea" id="text-3" rows="3" placeholder="Type freestyle here..."></textarea>
         </div>
-
         <button class="submit-btn" id="submitAll" onclick="finalSubmit()">Submit to the Link</button>
     </div>
     <div id="status">Select an agency above to begin.</div>
 </div>
 
+<script>
+    // GLOBAL LOGIC - Works even before Firebase loads
+    const promptMap = {
+        'LEO': ["What should dispatchers know about their role in your safety?", "Tell us about a call where dispatch was your lifeline."],
+        'FIRE': ["How does a calm dispatcher change the scene for you?", "Share a moment where dispatch made a life-saving difference."],
+        'EMS': ["How do pre-arrival instructions help you on a call?", "Tell us about a medical emergency where dispatch played a key role."],
+        'CITIZEN': ["What would you like to say to those who answer your 911 calls?", "Share a story of a time 911 dispatch was there for you."]
+    };
+
+    let selectedAgency = "";
+    
+    function setAgency(type, btn) {
+        // Handle Button Colors
+        document.querySelectorAll('.agency-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        selectedAgency = type;
+        
+        // Swap Text
+        document.getElementById('title-1').innerText = promptMap[type][0];
+        document.getElementById('title-2').innerText = promptMap[type][1];
+        
+        // Show Content
+        document.getElementById('questions-section').style.display = 'block';
+        document.getElementById('status').innerText = "Ready.";
+    }
+</script>
+
 <script type="module">
+    // FIREBASE MODULE - Handles the heavy lifting
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
     import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -113,33 +132,9 @@
     const db = getFirestore(app);
     const storage = getStorage(app);
 
-    const promptMap = {
-        'LEO': ["What should dispatchers know about their role in your safety?", "Tell us about a call where dispatch was your lifeline."],
-        'FIRE': ["How does a calm dispatcher change the scene for you?", "Share a moment where dispatch made a life-saving difference."],
-        'EMS': ["How do pre-arrival instructions help you on a call?", "Tell us about a medical emergency where dispatch played a key role."],
-        'CITIZEN': ["What would you like to say to those who answer your 911 calls?", "Share a story of a time 911 dispatch was there for you."]
-    };
-
     let mediaRecorder;
     let audioChunks = [];
-    let selectedAgency = "";
     const audioBlobs = {};
-
-    // BUTTON FIX: Using a direct loop with click events
-    const buttons = document.querySelectorAll('.agency-btn');
-    buttons.forEach(btn => {
-        btn.addEventListener('click', function() {
-            buttons.forEach(b => b.classList.remove('active'));
-            this.classList.add('active');
-            selectedAgency = this.getAttribute('data-type');
-            
-            document.getElementById('title-1').innerText = promptMap[selectedAgency][0];
-            document.getElementById('title-2').innerText = promptMap[selectedAgency][1];
-            
-            document.getElementById('questions-section').style.display = 'block';
-            document.getElementById('status').innerText = "Ready to record.";
-        });
-    });
 
     window.startRec = async (id) => {
         try {
@@ -154,7 +149,7 @@
             mediaRecorder.start();
             document.getElementById(`btn-rec-${id}`).style.display = 'none';
             document.getElementById(`btn-stop-${id}`).style.display = 'block';
-        } catch (e) { alert("Mic access denied."); }
+        } catch(e) { alert("Mic required."); }
     };
 
     window.stopRec = (id) => {
@@ -165,15 +160,14 @@
     };
 
     window.playPrev = (id) => {
-        if (audioBlobs[id]) {
+        if(audioBlobs[id]) {
             const url = URL.createObjectURL(audioBlobs[id]);
             new Audio(url).play();
         }
     };
 
     window.finalSubmit = async () => {
-        const status = document.getElementById('status');
-        status.innerText = "Submitting...";
+        document.getElementById('status').innerText = "Uploading...";
         try {
             for (let i = 1; i <= 3; i++) {
                 const note = document.getElementById(`text-${i}`).value.trim();
@@ -197,10 +191,7 @@
             }
             alert("Success!");
             window.location.href = "index.html";
-        } catch (e) { 
-            alert("Error. Try again."); 
-            status.innerText = "Error.";
-        }
+        } catch(e) { alert("Error. Try again."); }
     };
 </script>
 </body>
