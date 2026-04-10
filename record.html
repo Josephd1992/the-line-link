@@ -20,12 +20,7 @@
         .rec-btn { background: #fbbf24; color: #000; }
         .stop-btn { background: #ef4444; color: white; display: none; }
         
-        /* Preview Player Styling */
-        .preview-container { margin-top: 15px; display: none; padding: 10px; background: #1e293b; border-radius: 8px; }
-        .preview-container audio { width: 100%; height: 35px; margin-top: 5px; }
-        .preview-label { font-size: 0.7rem; color: #fbbf24; text-transform: uppercase; font-weight: bold; }
-
-        .submit-btn { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 450px; background: #22c55e; color: white; border: none; padding: 18px; border-radius: 12px; font-size: 1.1rem; font-weight: bold; box-shadow: 0 4px 20px rgba(0,0,0,0.5); cursor: pointer; z-index: 100; }
+        .submit-btn { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 450px; background: #22c55e; color: white; border: none; padding: 18px; border-radius: 12px; font-size: 1.1rem; font-weight: bold; box-shadow: 0 4px 20px rgba(0,0,0,0.5); cursor: pointer; }
         #status { text-align: center; color: #94a3b8; font-size: 0.9rem; margin-top: 10px; }
     </style>
 </head>
@@ -40,10 +35,6 @@
             <button class="rec-btn" id="btn-rec-1" onclick="startRec(1)">Record Voice</button>
             <button class="stop-btn" id="btn-stop-1" onclick="stopRec(1)">Stop (0s)</button>
         </div>
-        <div class="preview-container" id="preview-wrap-1">
-            <div class="preview-label">Preview Recording:</div>
-            <audio id="preview-player-1" controls></audio>
-        </div>
         <textarea id="text-1" rows="3" placeholder="Or type your message here..."></textarea>
     </div>
 
@@ -53,22 +44,14 @@
             <button class="rec-btn" id="btn-rec-2" onclick="startRec(2)">Record Voice</button>
             <button class="stop-btn" id="btn-stop-2" onclick="stopRec(2)">Stop (0s)</button>
         </div>
-        <div class="preview-container" id="preview-wrap-2">
-            <div class="preview-label">Preview Recording:</div>
-            <audio id="preview-player-2" controls></audio>
-        </div>
         <textarea id="text-2" rows="3" placeholder="Or type your message here..."></textarea>
     </div>
 
     <div class="prompt-card">
-        <div class="prompt-title" id="title-3">Freestyle: Anything else you'd like to say?</div>
+        <div class="prompt-title" id="title-3">Anything else you'd like to say?</div>
         <div class="controls">
             <button class="rec-btn" id="btn-rec-3" onclick="startRec(3)">Record Voice</button>
             <button class="stop-btn" id="btn-stop-3" onclick="stopRec(3)">Stop (0s)</button>
-        </div>
-        <div class="preview-container" id="preview-wrap-3">
-            <div class="preview-label">Preview Recording:</div>
-            <audio id="preview-player-3" controls></audio>
         </div>
         <textarea id="text-3" rows="3" placeholder="Or type your message here..."></textarea>
     </div>
@@ -125,34 +108,23 @@
             
             mediaRecorder.onstop = () => {
                 clearInterval(elapsedTimer);
-                const blob = new Blob(audioChunks, { type: 'audio/webm' });
-                audioBlobs[id] = blob;
-
-                const player = document.getElementById(`preview-player-${id}`);
-                player.src = URL.createObjectURL(blob);
-                document.getElementById(`preview-wrap-${id}`).style.display = 'block';
-                
+                audioBlobs[id] = new Blob(audioChunks, { type: 'audio/webm' });
                 document.getElementById(`btn-stop-${id}`).style.display = 'none';
-                document.getElementById(`btn-rec-${id}`).style.display = 'block';
-                document.getElementById(`btn-rec-${id}`).innerText = "Redo Recording";
+                const recBtn = document.getElementById(`btn-rec-${id}`);
+                recBtn.style.display = 'block';
+                recBtn.innerText = "Redo Recording";
             };
 
             mediaRecorder.start();
-            
-            document.getElementById(`preview-wrap-${id}`).style.display = 'none';
             document.getElementById(`btn-rec-${id}`).style.display = 'none';
-            
             const stopBtn = document.getElementById(`btn-stop-${id}`);
             stopBtn.style.display = 'block';
             
             let seconds = 0;
             stopBtn.innerText = `Stop (0s)`;
-            stopBtn.style.background = "#ef4444";
-
             elapsedTimer = setInterval(() => {
                 seconds++;
                 stopBtn.innerText = `Stop (${seconds}s)`;
-                if (seconds >= 60) stopBtn.style.background = "#991b1b"; 
             }, 1000);
 
         } catch(e) { alert("Microphone access is required."); }
@@ -166,7 +138,7 @@
 
     window.finalSubmit = async () => {
         const status = document.getElementById('status');
-        status.innerText = "Uploading to The Gold Line Link...";
+        status.innerText = "Submitting...";
         
         try {
             for (let i = 1; i <= 3; i++) {
@@ -189,12 +161,9 @@
                     });
                 }
             }
-            alert("Success! Your message has been sent to the supervisor review queue.");
+            alert("Sent to the gallery!");
             window.location.href = "index.html";
-        } catch(e) { 
-            console.error(e);
-            alert("Submission error. Check your connection."); 
-        }
+        } catch(e) { alert("Error saving message."); }
     };
 </script>
 </body>
