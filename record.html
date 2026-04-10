@@ -79,20 +79,24 @@
     const db = getFirestore(app);
     const storage = getStorage(app);
 
+    // --- Agency & Prompt Logic ---
     const params = new URLSearchParams(window.location.search);
     const selectedAgency = params.get('agency') || 'CITIZEN';
 
     const promptMap = {
-        'LEO': ["What’s a specific call where a dispatcher's calm voice made a difference?", "What’s one thing you want the dispatchers to know about life on the street?"],
+        'LEO': ["What’s a call where a dispatcher's calm voice made the difference?", "What’s one thing you want dispatchers to know about life on the street?"],
         'FIRE': ["Tell us about a time dispatch helped you coordinate a complex scene.", "What’s a message of support for the 'Voice behind the Radio'?"],
-        'EMS': ["How has a dispatcher’s pre-arrival instructions helped you on a medical call?", "What does having a professional dispatcher mean to you as a medic?"],
-        'CITIZEN': ["Tell a story of a time you called 911 and felt supported.", "What would you like to say to the person who answers when Roswell calls for help?"]
+        'EMS': ["How have pre-arrival instructions helped you on a medical call?", "What does a professional dispatcher mean to you as a medic?"],
+        'CITIZEN': ["Tell a story of a time you called 911 and felt supported.", "What would you like to say to the person who answers when Roswell calls?"]
     };
 
-    document.getElementById('headerTitle').innerText = `Appreciation for ${selectedAgency}`;
+    const agencyCleanName = { 'LEO': 'Law Enforcement', 'FIRE': 'Fire / Rescue', 'EMS': 'EMS / Medical', 'CITIZEN': 'The Community' };
+
+    document.getElementById('headerTitle').innerText = `Appreciation from ${agencyCleanName[selectedAgency]}`;
     document.getElementById('title-1').innerText = promptMap[selectedAgency][0];
     document.getElementById('title-2').innerText = promptMap[selectedAgency][1];
 
+    // --- Recording Logic ---
     let mediaRecorder;
     let audioChunks = [];
     let elapsedTimer;
@@ -136,15 +140,19 @@
         }
     };
 
+    // --- Submit Logic ---
     window.finalSubmit = async () => {
         const status = document.getElementById('status');
-        status.innerText = "Submitting...";
+        status.innerText = "Submitting to the Gold Line...";
         
         try {
+            let hasContent = false;
             for (let i = 1; i <= 3; i++) {
                 const note = document.getElementById(`text-${i}`).value.trim();
                 const audio = audioBlobs[i];
+                
                 if (audio || note !== "") {
+                    hasContent = true;
                     let url = "";
                     if (audio) {
                         const fileRef = ref(storage, `audios/${Date.now()}_${i}.webm`);
@@ -161,9 +169,19 @@
                     });
                 }
             }
-            alert("Sent to the gallery!");
+            
+            if(!hasContent) {
+                status.innerText = "";
+                return alert("Please record or type something first!");
+            }
+
+            alert("Success! Sent to the gallery review queue.");
             window.location.href = "index.html";
-        } catch(e) { alert("Error saving message."); }
+        } catch(e) { 
+            console.error(e);
+            alert("Error saving. Please check your connection."); 
+            status.innerText = "";
+        }
     };
 </script>
 </body>
