@@ -9,12 +9,9 @@
         .container { max-width: 500px; width: 100%; padding-bottom: 50px; }
         h1 { color: #fbbf24; text-align: center; font-size: 1.8rem; margin-top: 10px; margin-bottom: 25px; }
         
-        /* 5-Button Filter Grid */
         .filter-bar { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 15px; }
         .filter-btn { padding: 12px 5px; border: 1px solid #334155; border-radius: 8px; background: #111; color: #94a3b8; cursor: pointer; font-size: 0.65rem; font-weight: bold; transition: 0.3s; text-transform: uppercase; }
         .filter-btn.active { border-color: #fbbf24; color: #fbbf24; background: rgba(251, 191, 36, 0.1); }
-        
-        /* Random Button spans the whole width below the 4 filters */
         .btn-random { grid-column: span 4; background: #fbbf24; color: #000; border: none; font-size: 0.85rem; margin-top: 5px; padding: 15px; }
 
         .message-card { background: #111; border: 1px solid #334155; border-radius: 12px; padding: 15px; margin-bottom: 15px; position: relative; overflow: hidden; transition: 0.2s; cursor: pointer; }
@@ -27,12 +24,16 @@
         .card-header { font-size: 0.7rem; font-weight: bold; margin-bottom: 8px; display: flex; justify-content: space-between; }
         .prompt-preview { font-weight: bold; font-size: 0.95rem; color: #e2e8f0; margin-bottom: 5px; line-height: 1.4; }
         
-        /* Content hidden until card is tapped */
         .card-content { display: none; border-top: 1px solid #1e293b; padding-top: 12px; margin-top: 10px; }
         audio { width: 100%; margin-bottom: 10px; height: 35px; }
         .text-note { font-size: 0.95rem; color: #cbd5e1; font-style: italic; line-height: 1.5; white-space: pre-wrap; }
 
-        .btn-adm { padding: 12px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 0.8rem; width: 100%; margin-top: 15px; background: #22c55e; color: white; }
+        /* Admin Action Buttons */
+        .admin-flex { display: flex; gap: 10px; margin-top: 15px; }
+        .btn-adm { flex: 1; padding: 12px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 0.8rem; }
+        .btn-app { background: #22c55e; color: white; }
+        .btn-del { background: #ef4444; color: white; }
+        
         .nav-link { display: block; text-align: center; margin-top: 40px; color: #fbbf24; text-decoration: none; font-size: 0.9rem; font-weight: bold; }
     </style>
 </head>
@@ -56,7 +57,7 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, collection, getDocs, query, orderBy, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, collection, getDocs, query, orderBy, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyC4-eypucZ9FjS4sk4CQgkeNMPyyh4HvcU",
@@ -101,7 +102,12 @@
                 <div class="card-content" id="c-${m.id}">
                     ${m.audioUrl ? `<audio controls src="${m.audioUrl}"></audio>` : ''}
                     ${m.textNote ? `<div class="text-note">"${m.textNote}"</div>` : ''}
-                    ${isAdmin && !m.approved ? `<button class="btn-adm" onclick="approve('${m.id}')">APPROVE MESSAGE</button>` : ''}
+                    ${isAdmin ? `
+                        <div class="admin-flex">
+                            ${!m.approved ? `<button class="btn-adm btn-app" onclick="manage('${m.id}', 'approve')">APPROVE</button>` : ''}
+                            <button class="btn-adm btn-del" onclick="manage('${m.id}', 'delete')">DELETE</button>
+                        </div>
+                    ` : ''}
                 </div>
             `;
             
@@ -127,21 +133,27 @@
         if (approved.length === 0) return alert("No approved messages yet!");
         const random = approved[Math.floor(Math.random() * approved.length)];
         render([random]);
-        // Auto-expand the random one
         setTimeout(() => {
             const content = document.getElementById(`c-${random.id}`);
             if(content) content.style.display = 'block';
         }, 100);
     };
 
-    window.approve = async (id) => {
+    // Unified Admin Manager (Approve or Delete)
+    window.manage = async (id, action) => {
         const pin = prompt("Supervisor PIN:");
-        if (pin === "1033") {
+        if (pin !== "1033") return alert("Incorrect PIN");
+
+        if (action === 'approve') {
             await updateDoc(doc(db, "messages", id), { approved: true });
-            location.reload();
-        } else {
-            alert("Incorrect PIN");
+            alert("Message Published.");
+        } else if (action === 'delete') {
+            if (confirm("Are you sure? This will permanently delete the message.")) {
+                await deleteDoc(doc(db, "messages", id));
+                alert("Message Deleted.");
+            }
         }
+        location.reload();
     };
 
     loadData();
