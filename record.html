@@ -28,7 +28,10 @@
         .controls { display: flex; gap: 10px; margin-bottom: 5px; }
         .rec-btn { flex: 2; padding: 12px; border-radius: 8px; border: none; font-weight: bold; background: #fbbf24; color: #000; cursor: pointer; }
         .stop-btn { flex: 1; padding: 12px; border-radius: 8px; border: none; font-weight: bold; background: #ef4444; color: white; display: none; cursor: pointer; }
-        .preview-btn { flex: 1; padding: 12px; border-radius: 8px; border: none; font-weight: bold; background: #475569; color: white; display: none; cursor: pointer; }
+        
+        /* Preview Player Styling */
+        .preview-wrap { display: none; margin-top: 15px; background: #000; padding: 10px; border-radius: 8px; border: 1px solid #fbbf24; }
+        .preview-wrap audio { width: 100%; height: 35px; }
 
         .prompt-textarea { width: 100%; background: #000; border: 1px solid #334155; border-radius: 8px; padding: 12px; color: white; font-family: inherit; resize: none; box-sizing: border-box; }
         .submit-btn { width: 100%; padding: 20px; border-radius: 12px; border: none; background: #fbbf24; color: #000; font-size: 1.2rem; font-weight: bold; cursor: pointer; margin-top: 10px; }
@@ -60,7 +63,10 @@
             <div class="controls">
                 <button class="rec-btn" id="btn-rec-1" onclick="startRec(1)">Record Voice</button>
                 <button class="stop-btn" id="btn-stop-1" onclick="stopRec(1)">Stop</button>
-                <button class="preview-btn" id="btn-prev-1" onclick="playPrev(1)">Preview</button>
+            </div>
+            <div class="preview-wrap" id="preview-wrap-1">
+                <div style="font-size:0.7rem; margin-bottom:5px; color:#fbbf24;">PREVIEW RECORDING:</div>
+                <audio id="player-1" controls></audio>
             </div>
             <div class="or-divider">— OR —</div>
             <textarea class="prompt-textarea" id="text-1" rows="3" placeholder="Type here..."></textarea>
@@ -71,7 +77,10 @@
             <div class="controls">
                 <button class="rec-btn" id="btn-rec-2" onclick="startRec(2)">Record Voice</button>
                 <button class="stop-btn" id="btn-stop-2" onclick="stopRec(2)">Stop</button>
-                <button class="preview-btn" id="btn-prev-2" onclick="playPrev(2)">Preview</button>
+            </div>
+            <div class="preview-wrap" id="preview-wrap-2">
+                <div style="font-size:0.7rem; margin-bottom:5px; color:#fbbf24;">PREVIEW RECORDING:</div>
+                <audio id="player-2" controls></audio>
             </div>
             <div class="or-divider">— OR —</div>
             <textarea class="prompt-textarea" id="text-2" rows="3" placeholder="Type here..."></textarea>
@@ -79,11 +88,14 @@
 
         <div class="prompt-card">
             <div class="prompt-title">The "Open Mic" (Freestyle)</div>
-            <div class="prompt-instruction">Have a quick joke, a funny shift story, or just a generic thank you? Leave it here.</div>
+            <div class="prompt-instruction">Have a quick joke, a funny shift story, or just a thank you? Leave it here.</div>
             <div class="controls">
                 <button class="rec-btn" id="btn-rec-3" onclick="startRec(3)">Record Voice</button>
                 <button class="stop-btn" id="btn-stop-3" onclick="stopRec(3)">Stop</button>
-                <button class="preview-btn" id="btn-prev-3" onclick="playPrev(3)">Preview</button>
+            </div>
+            <div class="preview-wrap" id="preview-wrap-3">
+                <div style="font-size:0.7rem; margin-bottom:5px; color:#fbbf24;">PREVIEW RECORDING:</div>
+                <audio id="player-3" controls></audio>
             </div>
             <div class="or-divider">— OR —</div>
             <textarea class="prompt-textarea" id="text-3" rows="3" placeholder="Type freestyle here..."></textarea>
@@ -96,22 +108,10 @@
 
 <script>
     const promptMap = {
-        'LEO': [
-            "What does a dispatcher's role mean to you?", 
-            "Tell us about a call where dispatch was your lifeline."
-        ],
-        'FIRE': [
-            "What does a dispatcher's role mean to you?", 
-            "Share a moment where dispatch coordination made a life-saving difference."
-        ],
-        'EMS': [
-            "What does a dispatcher's role mean to you?", 
-            "Tell us about a medical emergency where dispatch played a key role."
-        ],
-        'CITIZEN': [
-            "What would you like to say to those who answer your 911 calls?", 
-            "Share a story of a time 911 dispatch was there for you."
-        ]
+        'LEO': ["What does a dispatcher's role mean to you?", "Tell us about a call where dispatch was your lifeline."],
+        'FIRE': ["What does a dispatcher's role mean to you?", "Share a moment where coordination made a life-saving difference."],
+        'EMS': ["What does a dispatcher's role mean to you?", "Tell us about an emergency where dispatch played a key role."],
+        'CITIZEN': ["What would you like to say to those who answer your calls?", "Share a story of a time 911 was there for you."]
     };
 
     let selectedAgency = "";
@@ -147,6 +147,7 @@
 
     let mediaRecorder;
     let audioChunks = [];
+    let elapsedTimer;
     const audioBlobs = {};
 
     window.startRec = async (id) => {
@@ -154,14 +155,33 @@
             const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
             mediaRecorder = new MediaRecorder(stream);
             audioChunks = [];
+            
             mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+            
             mediaRecorder.onstop = () => {
-                audioBlobs[id] = new Blob(audioChunks, { type: 'audio/webm' });
-                document.getElementById(`btn-prev-${id}`).style.display = 'block';
+                clearInterval(elapsedTimer);
+                const blob = new Blob(audioChunks, { type: 'audio/webm' });
+                audioBlobs[id] = blob;
+
+                // Show the Time Bar Preview
+                const player = document.getElementById(`player-${id}`);
+                player.src = URL.createObjectURL(blob);
+                document.getElementById(`preview-wrap-${id}`).style.display = 'block';
             };
+
             mediaRecorder.start();
             document.getElementById(`btn-rec-${id}`).style.display = 'none';
-            document.getElementById(`btn-stop-${id}`).style.display = 'block';
+            document.getElementById(`preview-wrap-${id}`).style.display = 'none';
+            const stopBtn = document.getElementById(`btn-stop-${id}`);
+            stopBtn.style.display = 'block';
+
+            let seconds = 0;
+            stopBtn.innerText = `Stop (0s)`;
+            elapsedTimer = setInterval(() => {
+                seconds++;
+                stopBtn.innerText = `Stop (${seconds}s)`;
+            }, 1000);
+
         } catch(e) { alert("Microphone access is required."); }
     };
 
@@ -174,15 +194,9 @@
         }
     };
 
-    window.playPrev = (id) => {
-        if(audioBlobs[id]) {
-            const url = URL.createObjectURL(audioBlobs[id]);
-            new Audio(url).play();
-        }
-    };
-
     window.finalSubmit = async () => {
-        document.getElementById('status').innerText = "Uploading appreciation...";
+        const status = document.getElementById('status');
+        status.innerText = "Uploading appreciation...";
         try {
             for (let i = 1; i <= 3; i++) {
                 const note = document.getElementById(`text-${i}`).value.trim();
