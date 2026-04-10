@@ -6,59 +6,125 @@
     <title>The Gold Line Link - Record</title>
     <style>
         body { font-family: 'Segoe UI', sans-serif; background: #000; color: white; padding: 20px; display: flex; justify-content: center; margin: 0; }
-        .container { max-width: 500px; width: 100%; padding-bottom: 80px; }
-        h1 { color: #fbbf24; text-align: center; font-size: 1.5rem; margin-bottom: 30px; }
+        .container { max-width: 500px; width: 100%; padding-bottom: 50px; }
+        h1 { color: #fbbf24; text-align: center; margin-bottom: 10px; }
+        .sub-text { text-align: center; color: #94a3b8; margin-bottom: 30px; font-size: 1rem; font-style: italic; line-height: 1.4; }
         
-        .prompt-card { background: #111; border: 1px solid #334155; border-radius: 12px; padding: 20px; margin-bottom: 20px; }
-        .prompt-title { font-size: 1.1rem; font-weight: bold; margin-bottom: 15px; color: #f1f5f9; line-height: 1.4; }
+        .section-label { font-size: 0.8rem; text-transform: uppercase; color: #fbbf24; letter-spacing: 1px; margin: 20px 0 10px; font-weight: bold; }
         
-        textarea { width: 100%; background: #000; border: 1px solid #334155; border-radius: 8px; color: white; padding: 12px; font-size: 1rem; margin-top: 10px; resize: none; box-sizing: border-box; }
+        .agency-picker { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+        .agency-btn { padding: 15px; border: 1px solid #334155; border-radius: 10px; background: #111; color: #94a3b8; cursor: pointer; font-weight: bold; font-size: 0.75rem; transition: 0.3s; }
         
-        .controls { display: flex; gap: 10px; margin-top: 15px; }
-        .rec-btn, .stop-btn { flex: 1; padding: 12px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 0.9rem; transition: 0.3s; }
-        
-        .rec-btn { background: #fbbf24; color: #000; }
-        .stop-btn { background: #ef4444; color: white; display: none; }
-        
-        .submit-btn { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 450px; background: #22c55e; color: white; border: none; padding: 18px; border-radius: 12px; font-size: 1.1rem; font-weight: bold; box-shadow: 0 4px 20px rgba(0,0,0,0.5); cursor: pointer; }
-        #status { text-align: center; color: #94a3b8; font-size: 0.9rem; margin-top: 10px; }
+        .agency-btn.active[data-type="LEO"] { border-color: #3b82f6; color: #3b82f6; background: rgba(59, 130, 246, 0.1); }
+        .agency-btn.active[data-type="FIRE"] { border-color: #ef4444; color: #ef4444; background: rgba(239, 68, 68, 0.1); }
+        .agency-btn.active[data-type="EMS"] { border-color: #ffffff; color: #ffffff; background: rgba(255, 255, 255, 0.1); }
+        .agency-btn.active[data-type="CITIZEN"] { border-color: #fbbf24; color: #fbbf24; background: rgba(251, 191, 36, 0.1); }
+
+        .prompt-card { background: #111; border: 1px solid #334155; border-radius: 16px; padding: 20px; margin-bottom: 25px; }
+        .prompt-title { font-weight: bold; margin-bottom: 10px; font-size: 1.05rem; line-height: 1.4; color: #fbbf24; }
+        .prompt-instruction { font-size: 0.85rem; color: #94a3b8; margin-bottom: 15px; line-height: 1.3; }
+        .or-divider { text-align: center; color: #475569; font-size: 0.7rem; font-weight: bold; margin: 10px 0; text-transform: uppercase; letter-spacing: 1px; }
+
+        .controls { display: flex; gap: 10px; margin-bottom: 5px; }
+        .rec-btn { flex: 2; padding: 12px; border-radius: 8px; border: none; font-weight: bold; background: #fbbf24; color: #000; cursor: pointer; }
+        .stop-btn { flex: 1; padding: 12px; border-radius: 8px; border: none; font-weight: bold; background: #ef4444; color: white; display: none; cursor: pointer; }
+        .preview-btn { flex: 1; padding: 12px; border-radius: 8px; border: none; font-weight: bold; background: #475569; color: white; display: none; cursor: pointer; }
+
+        .prompt-textarea { width: 100%; background: #000; border: 1px solid #334155; border-radius: 8px; padding: 12px; color: white; font-family: inherit; resize: none; box-sizing: border-box; }
+        .submit-btn { width: 100%; padding: 20px; border-radius: 12px; border: none; background: #fbbf24; color: #000; font-size: 1.2rem; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        #status { text-align: center; margin-top: 15px; color: #fbbf24; font-weight: bold; }
+        .back-nav { margin-bottom: 20px; text-align: center; }
+        .back-btn { color: #fbbf24; text-decoration: none; border: 1px solid #fbbf24; padding: 5px 15px; border-radius: 20px; font-size: 0.8rem; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1 id="headerTitle">Send Appreciation</h1>
-    
-    <div class="prompt-card">
-        <div class="prompt-title" id="title-1">Loading prompt...</div>
-        <div class="controls">
-            <button class="rec-btn" id="btn-rec-1" onclick="startRec(1)">Record Voice</button>
-            <button class="stop-btn" id="btn-stop-1" onclick="stopRec(1)">Stop (0s)</button>
-        </div>
-        <textarea id="text-1" rows="3" placeholder="Or type your message here..."></textarea>
+    <div class="back-nav"><a href="index.html" class="back-btn">← BACK</a></div>
+    <h1>The Gold Line Link</h1>
+    <p class="sub-text">Honoring the voices that bridge the gap between chaos and help.</p>
+
+    <div class="section-label">1. Who is sending this?</div>
+    <div class="agency-picker">
+        <button class="agency-btn" data-type="LEO" onclick="setAgency('LEO', this)">LAW ENFORCEMENT</button>
+        <button class="agency-btn" data-type="FIRE" onclick="setAgency('FIRE', this)">FIRE / RESCUE</button>
+        <button class="agency-btn" data-type="EMS" onclick="setAgency('EMS', this)">EMS / MEDICAL</button>
+        <button class="agency-btn" data-type="CITIZEN" onclick="setAgency('CITIZEN', this)">COMMUNITY MEMBER</button>
     </div>
 
-    <div class="prompt-card">
-        <div class="prompt-title" id="title-2">Loading prompt...</div>
-        <div class="controls">
-            <button class="rec-btn" id="btn-rec-2" onclick="startRec(2)">Record Voice</button>
-            <button class="stop-btn" id="btn-stop-2" onclick="stopRec(2)">Stop (0s)</button>
+    <div id="questions-section" style="display:none;">
+        <div class="section-label">2. Your Message</div>
+        
+        <div class="prompt-card">
+            <div class="prompt-title" id="title-1">Prompt 1</div>
+            <div class="controls">
+                <button class="rec-btn" id="btn-rec-1" onclick="startRec(1)">Record Voice</button>
+                <button class="stop-btn" id="btn-stop-1" onclick="stopRec(1)">Stop</button>
+                <button class="preview-btn" id="btn-prev-1" onclick="playPrev(1)">Preview</button>
+            </div>
+            <div class="or-divider">— OR —</div>
+            <textarea class="prompt-textarea" id="text-1" rows="3" placeholder="Type here..."></textarea>
         </div>
-        <textarea id="text-2" rows="3" placeholder="Or type your message here..."></textarea>
-    </div>
 
-    <div class="prompt-card">
-        <div class="prompt-title" id="title-3">Anything else you'd like to say?</div>
-        <div class="controls">
-            <button class="rec-btn" id="btn-rec-3" onclick="startRec(3)">Record Voice</button>
-            <button class="stop-btn" id="btn-stop-3" onclick="stopRec(3)">Stop (0s)</button>
+        <div class="prompt-card">
+            <div class="prompt-title" id="title-2">Prompt 2</div>
+            <div class="controls">
+                <button class="rec-btn" id="btn-rec-2" onclick="startRec(2)">Record Voice</button>
+                <button class="stop-btn" id="btn-stop-2" onclick="stopRec(2)">Stop</button>
+                <button class="preview-btn" id="btn-prev-2" onclick="playPrev(2)">Preview</button>
+            </div>
+            <div class="or-divider">— OR —</div>
+            <textarea class="prompt-textarea" id="text-2" rows="3" placeholder="Type here..."></textarea>
         </div>
-        <textarea id="text-3" rows="3" placeholder="Or type your message here..."></textarea>
-    </div>
 
-    <div id="status"></div>
-    <button class="submit-btn" onclick="finalSubmit()">SEND TO GALLERY</button>
+        <div class="prompt-card">
+            <div class="prompt-title">The "Open Mic" (Freestyle)</div>
+            <div class="prompt-instruction">Have a quick joke, a funny shift story, or just a generic thank you? Leave it here.</div>
+            <div class="controls">
+                <button class="rec-btn" id="btn-rec-3" onclick="startRec(3)">Record Voice</button>
+                <button class="stop-btn" id="btn-stop-3" onclick="stopRec(3)">Stop</button>
+                <button class="preview-btn" id="btn-prev-3" onclick="playPrev(3)">Preview</button>
+            </div>
+            <div class="or-divider">— OR —</div>
+            <textarea class="prompt-textarea" id="text-3" rows="3" placeholder="Type freestyle here..."></textarea>
+        </div>
+
+        <button class="submit-btn" id="submitAll" onclick="finalSubmit()">Submit to the Link</button>
+    </div>
+    <div id="status">Select an agency above to begin.</div>
 </div>
+
+<script>
+    const promptMap = {
+        'LEO': [
+            "What does a dispatcher's role mean to you?", 
+            "Tell us about a call where dispatch was your lifeline."
+        ],
+        'FIRE': [
+            "What does a dispatcher's role mean to you?", 
+            "Share a moment where dispatch coordination made a life-saving difference."
+        ],
+        'EMS': [
+            "What does a dispatcher's role mean to you?", 
+            "Tell us about a medical emergency where dispatch played a key role."
+        ],
+        'CITIZEN': [
+            "What would you like to say to those who answer your 911 calls?", 
+            "Share a story of a time 911 dispatch was there for you."
+        ]
+    };
+
+    let selectedAgency = "";
+    function setAgency(type, btn) {
+        document.querySelectorAll('.agency-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        selectedAgency = type;
+        document.getElementById('title-1').innerText = promptMap[type][0];
+        document.getElementById('title-2').innerText = promptMap[type][1];
+        document.getElementById('questions-section').style.display = 'block';
+        document.getElementById('status').innerText = "Ready.";
+    }
+</script>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
@@ -79,27 +145,8 @@
     const db = getFirestore(app);
     const storage = getStorage(app);
 
-    // --- Agency & Prompt Logic ---
-    const params = new URLSearchParams(window.location.search);
-    const selectedAgency = params.get('agency') || 'CITIZEN';
-
-    const promptMap = {
-        'LEO': ["What’s a call where a dispatcher's calm voice made the difference?", "What’s one thing you want dispatchers to know about life on the street?"],
-        'FIRE': ["Tell us about a time dispatch helped you coordinate a complex scene.", "What’s a message of support for the 'Voice behind the Radio'?"],
-        'EMS': ["How have pre-arrival instructions helped you on a medical call?", "What does a professional dispatcher mean to you as a medic?"],
-        'CITIZEN': ["Tell a story of a time you called 911 and felt supported.", "What would you like to say to the person who answers when Roswell calls?"]
-    };
-
-    const agencyCleanName = { 'LEO': 'Law Enforcement', 'FIRE': 'Fire / Rescue', 'EMS': 'EMS / Medical', 'CITIZEN': 'The Community' };
-
-    document.getElementById('headerTitle').innerText = `Appreciation from ${agencyCleanName[selectedAgency]}`;
-    document.getElementById('title-1').innerText = promptMap[selectedAgency][0];
-    document.getElementById('title-2').innerText = promptMap[selectedAgency][1];
-
-    // --- Recording Logic ---
     let mediaRecorder;
     let audioChunks = [];
-    let elapsedTimer;
     const audioBlobs = {};
 
     window.startRec = async (id) => {
@@ -107,52 +154,40 @@
             const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
             mediaRecorder = new MediaRecorder(stream);
             audioChunks = [];
-            
             mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
-            
             mediaRecorder.onstop = () => {
-                clearInterval(elapsedTimer);
                 audioBlobs[id] = new Blob(audioChunks, { type: 'audio/webm' });
-                document.getElementById(`btn-stop-${id}`).style.display = 'none';
-                const recBtn = document.getElementById(`btn-rec-${id}`);
-                recBtn.style.display = 'block';
-                recBtn.innerText = "Redo Recording";
+                document.getElementById(`btn-prev-${id}`).style.display = 'block';
             };
-
             mediaRecorder.start();
             document.getElementById(`btn-rec-${id}`).style.display = 'none';
-            const stopBtn = document.getElementById(`btn-stop-${id}`);
-            stopBtn.style.display = 'block';
-            
-            let seconds = 0;
-            stopBtn.innerText = `Stop (0s)`;
-            elapsedTimer = setInterval(() => {
-                seconds++;
-                stopBtn.innerText = `Stop (${seconds}s)`;
-            }, 1000);
-
+            document.getElementById(`btn-stop-${id}`).style.display = 'block';
         } catch(e) { alert("Microphone access is required."); }
     };
 
     window.stopRec = (id) => {
-        if (mediaRecorder && mediaRecorder.state === "recording") {
+        if (mediaRecorder) {
             mediaRecorder.stop();
+            document.getElementById(`btn-stop-${id}`).style.display = 'none';
+            document.getElementById(`btn-rec-${id}`).style.display = 'block';
+            document.getElementById(`btn-rec-${id}`).innerText = "Redo Recording";
         }
     };
 
-    // --- Submit Logic ---
+    window.playPrev = (id) => {
+        if(audioBlobs[id]) {
+            const url = URL.createObjectURL(audioBlobs[id]);
+            new Audio(url).play();
+        }
+    };
+
     window.finalSubmit = async () => {
-        const status = document.getElementById('status');
-        status.innerText = "Submitting to the Gold Line...";
-        
+        document.getElementById('status').innerText = "Uploading appreciation...";
         try {
-            let hasContent = false;
             for (let i = 1; i <= 3; i++) {
                 const note = document.getElementById(`text-${i}`).value.trim();
                 const audio = audioBlobs[i];
-                
                 if (audio || note !== "") {
-                    hasContent = true;
                     let url = "";
                     if (audio) {
                         const fileRef = ref(storage, `audios/${Date.now()}_${i}.webm`);
@@ -169,18 +204,10 @@
                     });
                 }
             }
-            
-            if(!hasContent) {
-                status.innerText = "";
-                return alert("Please record or type something first!");
-            }
-
-            alert("Success! Sent to the gallery review queue.");
+            alert("Success! Your message has been sent for review.");
             window.location.href = "index.html";
         } catch(e) { 
-            console.error(e);
-            alert("Error saving. Please check your connection."); 
-            status.innerText = "";
+            alert("Submission error. Please try again."); 
         }
     };
 </script>
