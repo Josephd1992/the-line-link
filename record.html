@@ -6,7 +6,10 @@
     <title>The Gold Line Link - Record</title>
     <style>
         body { font-family: 'Segoe UI', sans-serif; background: #000; color: white; padding: 20px; display: flex; justify-content: center; margin: 0; }
-        .container { max-width: 500px; width: 100%; padding-bottom: 50px; }
+        
+        /* The padding-bottom here ensures the keyboard doesn't hide the last text box */
+        .container { max-width: 500px; width: 100%; padding-bottom: 350px; }
+        
         h1 { color: #fbbf24; text-align: center; margin-bottom: 10px; }
         .sub-text { text-align: center; color: #94a3b8; margin-bottom: 30px; font-size: 1rem; font-style: italic; line-height: 1.4; }
         
@@ -29,12 +32,14 @@
         .rec-btn { flex: 2; padding: 12px; border-radius: 8px; border: none; font-weight: bold; background: #fbbf24; color: #000; cursor: pointer; }
         .stop-btn { flex: 1; padding: 12px; border-radius: 8px; border: none; font-weight: bold; background: #ef4444; color: white; display: none; cursor: pointer; }
         
-        /* Preview Player Styling */
         .preview-wrap { display: none; margin-top: 15px; background: #000; padding: 10px; border-radius: 8px; border: 1px solid #fbbf24; }
         .preview-wrap audio { width: 100%; height: 35px; }
 
         .prompt-textarea { width: 100%; background: #000; border: 1px solid #334155; border-radius: 8px; padding: 12px; color: white; font-family: inherit; resize: none; box-sizing: border-box; }
-        .submit-btn { width: 100%; padding: 20px; border-radius: 12px; border: none; background: #fbbf24; color: #000; font-size: 1.2rem; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        
+        /* Updated Submit Button - No longer fixed, so it won't block text boxes */
+        .submit-btn { width: 100%; padding: 20px; border-radius: 12px; border: none; background: #fbbf24; color: #000; font-size: 1.2rem; font-weight: bold; cursor: pointer; margin-top: 30px; box-shadow: 0 4px 15px rgba(251, 191, 36, 0.3); }
+        
         #status { text-align: center; margin-top: 15px; color: #fbbf24; font-weight: bold; }
         .back-nav { margin-bottom: 20px; text-align: center; }
         .back-btn { color: #fbbf24; text-decoration: none; border: 1px solid #fbbf24; padding: 5px 15px; border-radius: 20px; font-size: 0.8rem; }
@@ -62,7 +67,7 @@
             <div class="prompt-title" id="title-1">Prompt 1</div>
             <div class="controls">
                 <button class="rec-btn" id="btn-rec-1" onclick="startRec(1)">Record Voice</button>
-                <button class="stop-btn" id="btn-stop-1" onclick="stopRec(1)">Stop</button>
+                <button class="stop-btn" id="btn-stop-1" onclick="stopRec(1)">Stop (0s)</button>
             </div>
             <div class="preview-wrap" id="preview-wrap-1">
                 <div style="font-size:0.7rem; margin-bottom:5px; color:#fbbf24;">PREVIEW RECORDING:</div>
@@ -76,7 +81,7 @@
             <div class="prompt-title" id="title-2">Prompt 2</div>
             <div class="controls">
                 <button class="rec-btn" id="btn-rec-2" onclick="startRec(2)">Record Voice</button>
-                <button class="stop-btn" id="btn-stop-2" onclick="stopRec(2)">Stop</button>
+                <button class="stop-btn" id="btn-stop-2" onclick="stopRec(2)">Stop (0s)</button>
             </div>
             <div class="preview-wrap" id="preview-wrap-2">
                 <div style="font-size:0.7rem; margin-bottom:5px; color:#fbbf24;">PREVIEW RECORDING:</div>
@@ -91,7 +96,7 @@
             <div class="prompt-instruction">Have a quick joke, a funny shift story, or just a thank you? Leave it here.</div>
             <div class="controls">
                 <button class="rec-btn" id="btn-rec-3" onclick="startRec(3)">Record Voice</button>
-                <button class="stop-btn" id="btn-stop-3" onclick="stopRec(3)">Stop</button>
+                <button class="stop-btn" id="btn-stop-3" onclick="stopRec(3)">Stop (0s)</button>
             </div>
             <div class="preview-wrap" id="preview-wrap-3">
                 <div style="font-size:0.7rem; margin-bottom:5px; color:#fbbf24;">PREVIEW RECORDING:</div>
@@ -110,8 +115,8 @@
     const promptMap = {
         'LEO': ["What does a dispatcher's role mean to you?", "Tell us about a call where dispatch was your lifeline."],
         'FIRE': ["What does a dispatcher's role mean to you?", "Share a moment where dispatch coordination made a major difference on a scene."],
-        'EMS': ["What does a dispatcher's role mean to you?", "Tell us about an emergency where dispatch played a key role."],
-        'CITIZEN': ["What would you like to say to those who answer your calls?", "Share a story of a time 911 was there for you."]
+        'EMS': ["What does a dispatcher's role mean to you?", "Tell us about a medical emergency where dispatch played a key role."],
+        'CITIZEN': ["What would you like to say to those who answer your 911 calls?", "Share a story of a time 911 dispatch was there for you."]
     };
 
     let selectedAgency = "";
@@ -162,8 +167,6 @@
                 clearInterval(elapsedTimer);
                 const blob = new Blob(audioChunks, { type: 'audio/webm' });
                 audioBlobs[id] = blob;
-
-                // Show the Time Bar Preview
                 const player = document.getElementById(`player-${id}`);
                 player.src = URL.createObjectURL(blob);
                 document.getElementById(`preview-wrap-${id}`).style.display = 'block';
